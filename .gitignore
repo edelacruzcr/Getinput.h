@@ -1,0 +1,25 @@
+# Compilación y Objetos
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.exe
+
+# Directorio de ejecutable de binarios
+bin/
+build/
+
+# Archivos de Editores e IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# Archivos de Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
