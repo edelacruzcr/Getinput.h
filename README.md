@@ -1,4 +1,4 @@
-# 🛡️ get-input.h - Biblioteca de Entrada Segura y Robusta para C
+# get-input.h - Biblioteca de Entrada Segura y Robusta para C
 
 [![Lenguaje](https://img.shields.io/badge/Lenguaje-C99%20%2F%20C11%20%2F%20C17%20%2F%20C23-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-green.svg)](LICENSE)
@@ -6,15 +6,15 @@
 [![Tipo](https://img.shields.io/badge/Tipo-Header--Only-purple.svg)](get-input.h)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](Makefile)
 
-**`get-input.h`** es una biblioteca **header-only** para C que simplifica la entrada de datos del usuario por consola (`stdin`), haciendo que sea **segura, robusta y fácil de usar**.
+**`get-input.h`** es una biblioteca **header-only** para lenguaje C que simplifica la entrada de datos del usuario por consola (`stdin`), haciendo que sea **segura, robusta y fácil de usar**.
 
 ---
 
-## ⚡ Instalación Automática en un Solo Comando (Recomendado)
+## Instalación Automática en un Solo Comando (Recomendado)
 
-Para instalar `get-input.h` en tu sistema con un único comando mágico:
+Para instalar `get-input.h` en tu sistema con un único comando:
 
-### 🐧 Linux / 🍎 macOS / 🪟 Windows (Git Bash):
+### Linux / macOS / Windows (Git Bash):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/install.sh | bash
@@ -23,7 +23,7 @@ curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/install
 ¡Y listo! Ya puedes incluirla directamente en cualquier programa de C:
 
 ```c
-#include <get-input.h>   // ¡Instalado y listo para usar!
+#include <get-input.h>   // Instalado y listo para usar
 
 int main(void) {
     int edad = obtener_entero("Ingresa tu edad: ");
@@ -34,12 +34,12 @@ int main(void) {
 
 ---
 
-## 🎯 ¿Qué problema resuelve?
+## ¿Qué problema resuelve?
 
 ### El problema en C tradicional:
 
 ```c
-// ❌ Código complicado y peligroso (propenso a desbordamiento y bucles infinitos)
+// Código complicado y peligroso (propenso a desbordamiento y bucles infinitos)
 int edad;
 printf("Edad: ");
 if (scanf("%d", &edad) != 1) {
@@ -51,13 +51,13 @@ if (scanf("%d", &edad) != 1) {
 ### La solución con `get-input.h`:
 
 ```c
-// ✅ Simple, seguro y validado en una sola línea
+// Simple, seguro y validado en una sola línea
 int edad = obtener_entero_rango("Edad: ", 0, 120);
 ```
 
 ---
 
-## 🔧 Características Principales
+## Características Principales
 
 | Característica | Descripción |
 |----------------|-------------|
@@ -70,7 +70,7 @@ int edad = obtener_entero_rango("Edad: ", 0, 120);
 
 ---
 
-## 📦 Otros Métodos de Instalación
+## Otros Métodos de Instalación
 
 ### Método 1: Con Script Local (`install.sh`)
 ```bash
@@ -103,7 +103,7 @@ cp get-input.h include/
 
 ---
 
-## ⚙️ Compilación
+## Compilación
 
 Puedes compilar cualquier programa C que use `get-input.h` usando tu compilador habitual:
 
@@ -112,9 +112,20 @@ gcc -Wall -Wextra -std=c99 main.c -o programa
 ./programa
 ```
 
+### Compilar los Ejemplos del Repositorio
+El repositorio incluye un `Makefile` para compilar los ejemplos en `examples/`:
+
+```bash
+make
+./bin/01_basico
+./bin/02_validaciones
+./bin/03_email_telefono
+./bin/04_menu_interactivo
+```
+
 ---
 
-## 📐 Estructuras de Configuración
+## Estructuras de Configuración
 
 ```c
 // Para enteros
@@ -152,7 +163,16 @@ typedef struct {
 
 ---
 
-## 📚 Guía de Funciones
+## Elementos Opcionales vs. Obligatorios
+
+- **Buffer y Tamaño (`tamanio`)**: **Obligatorio** en lectura de cadenas (ej. `obtener_cadena(msg, buf, sizeof(buf))`). Esto le indica a `fgets()` la capacidad máxima de memoria para evitar desbordamientos.
+- **Estructuras `Config...`**: **Opcional**. Si usas funciones simples como `obtener_entero()` o `obtener_cadena()`, la biblioteca aplicará valores por defecto automáticamente.
+- **Reintentos (`reintentos`)**: **Opcional**. Por defecto vale `-1` (reintentos infinitos). Se modifica solo en casos de seguridad (ej. 3 intentos para un PIN).
+- **Mensajes de error (`mostrar_error`)**: **Opcional**. Por defecto es `1`. Puedes cambiarlo a `0` para operaciones silenciosas.
+
+---
+
+## Guía de Funciones
 
 ### 1. Funciones de Caracteres
 ```c
@@ -237,7 +257,7 @@ if (validar_email(email)) { printf("Email válido\n"); }
 
 ---
 
-## ⚡ Macros Útiles
+## Macros Útiles
 
 ```c
 #define INPUT_INT(msg) obtener_entero(msg)
@@ -250,11 +270,11 @@ if (validar_email(email)) { printf("Email válido\n"); }
 
 ---
 
-## 💡 Ejemplo Completo de Formulario
+## Ejemplo Completo de Formulario
 
 ```c
 #include <stdio.h>
-#include <get-input.h> // Si se instaló de forma global con un solo comando
+#include <get-input.h> // Si se instaló de forma global
 
 int main(void) {
     printf("=== REGISTRO DE USUARIO ===\n\n");
@@ -280,11 +300,11 @@ int main(void) {
     
     // 6. Confirmación
     if (obtener_si_no("¿Confirmas el registro?")) {
-        printf("\n✅ Usuario %s registrado correctamente.\n", nombre);
-        printf("📧 Email: %s\n", email);
-        printf("📱 Teléfono: %s\n", telefono);
+        printf("\n[OK] Usuario %s registrado correctamente.\n", nombre);
+        printf("Email: %s\n", email);
+        printf("Teléfono: %s\n", telefono);
     } else {
-        printf("\n❌ Registro cancelado.\n");
+        printf("\n[CANCELADO] Registro cancelado.\n");
     }
     
     return 0;
@@ -293,7 +313,7 @@ int main(void) {
 
 ---
 
-## 📊 Tabla de Funciones
+## Tabla de Funciones
 
 | Función | Parámetros | Retorna | Descripción |
 |---------|------------|---------|-------------|
@@ -315,7 +335,7 @@ int main(void) {
 
 ---
 
-## 🎯 ¿Cuándo Usar Cada Función?
+## ¿Cuándo Usar Cada Función?
 
 | Situación | Función Sugerida |
 |-----------|------------------|
@@ -334,22 +354,22 @@ int main(void) {
 
 ---
 
-## ⭐ Ventajas
+## Ventajas
 
-1. 🛡️ **Seguro**: Protege contra desbordamientos de buffer.
-2. 🔄 **Robusto**: Maneja entradas inválidas y limpia `stdin`.
-3. ⚡ **Simple**: Una sola línea para cada operación.
-4. ⚙️ **Configurable**: Límites, reintentos y errores.
-5. 🌐 **Portable**: Funciona en Linux, macOS y Windows.
-6. 📦 **Header-only**: Un solo archivo de cabecera.
-7. 📖 **Documentado**: Funciones explicadas y con ejemplos claros.
+1. **Seguro**: Protege contra desbordamientos de buffer.
+2. **Robusto**: Maneja entradas inválidas y limpia `stdin`.
+3. **Simple**: Una sola línea para cada operación.
+4. **Configurable**: Límites, reintentos y errores.
+5. **Portable**: Funciona en Linux, macOS y Windows.
+6. **Header-only**: Un solo archivo de cabecera.
+7. **Documentado**: Funciones explicadas y con ejemplos claros.
 
 ---
 
-## 🎉 ¡Listo para Usar!
+## ¡Listo para Usar!
 
 ```c
-#include <get-input.h>   // ¡Instalado automáticamente!
+#include <get-input.h>   // Instalado automáticamente
 
 int main(void) {
     int edad = obtener_entero_rango("Edad (0-120): ", 0, 120);
@@ -360,6 +380,6 @@ int main(void) {
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto está distribuido bajo la [Licencia MIT](LICENSE). Libre para uso comercial, académico y personal.

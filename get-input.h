@@ -91,7 +91,7 @@ static inline void _limpiar_buffer(void) {
 
 static inline void _mostrar_error(const char *mensaje, int mostrar) {
     if (mostrar) {
-        fprintf(stderr, "  ❌ %s\n", mensaje);
+        fprintf(stderr, "  Error: %s\n", mensaje);
     }
 }
 

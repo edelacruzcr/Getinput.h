@@ -1,10 +1,10 @@
-# 📖 Manual Técnico de Referencia - `get-input.h`
+# Manual Técnico de Referencia - `get-input.h`
 
 Este documento ofrece la especificación técnica completa sobre la arquitectura, estructuras de datos, funciones internas y análisis de elementos opcionales de la biblioteca **`get-input.h`**.
 
 ---
 
-## 🏗️ 1. Arquitectura Header-Only
+## 1. Arquitectura Header-Only
 
 `get-input.h` implementa el patrón **Header-Only** en lenguaje C. Todas sus funciones públicas e internas están definidas con el cualificador `static inline`.
 
@@ -14,7 +14,7 @@ Este documento ofrece la especificación técnica completa sobre la arquitectura
 
 ---
 
-## 🧼 2. Mecanismos Internos de Limpieza e Higiene de Buffer
+## 2. Mecanismos Internos de Limpieza e Higiene de Buffer
 
 ### 2.1 `_limpiar_buffer(void)`
 ```c
@@ -30,7 +30,7 @@ static inline void _limpiar_buffer(void) {
 ```c
 static inline void _mostrar_error(const char *mensaje, int mostrar) {
     if (mostrar) {
-        fprintf(stderr, "  ❌ %s\n", mensaje);
+        fprintf(stderr, "  Error: %s\n", mensaje);
     }
 }
 ```
@@ -38,7 +38,7 @@ static inline void _mostrar_error(const char *mensaje, int mostrar) {
 
 ---
 
-## ⚙️ 3. Estructuras de Configuración Avanzada
+## 3. Estructuras de Configuración Avanzada
 
 ### 3.1 `ConfigEntero`
 ```c
@@ -82,7 +82,7 @@ typedef struct {
 
 ---
 
-## 💡 4. Análisis de Elementos Opcionales vs. Obligatorios
+## 4. Análisis de Elementos Opcionales vs. Obligatorios
 
 ### Obligatorio:
 - **`tamanio` en lectura de cadenas**: Es **estrictamente obligatorio** pasar el tamaño real en bytes de la memoria asignada al buffer al llamar a `obtener_cadena` o `obtener_cadena_config`. Esto permite que la función configure internamente el parámetro de tamaño en `fgets()`, previniendo desbordamientos de buffer.
@@ -95,7 +95,7 @@ typedef struct {
 
 ---
 
-## 📊 5. Catálogo Completo de Funciones
+## 5. Catálogo Completo de Funciones
 
 ### Funciones de Carácter
 - `obtener_caracter(mensaje)`: Lee un carácter.

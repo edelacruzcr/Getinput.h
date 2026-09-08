@@ -1,4 +1,4 @@
-# 📚 GUÍA COMPLETA Y MANUAL DE FUNCIONES - `get-input.h`
+# GUÍA COMPLETA Y MANUAL DE FUNCIONES - `get-input.h`
 
 ## Índice
 1. [Introducción y Arquitectura](#1-introducción-y-arquitectura)
@@ -22,16 +22,16 @@
 ### ¿Qué es `get-input.h`?
 
 Es una biblioteca **header-only** en lenguaje C que **simplifica y asegura la entrada de datos por consola (`stdin`)**, solucionando automáticamente:
-- ✅ Validación automática de tipos de datos.
-- ✅ Limpieza transparente del buffer de entrada.
-- ✅ Reintentos automáticos configurables en caso de error.
-- ✅ Protección contra desbordamiento de buffer (*Buffer Overflow*).
-- ✅ Mensajes de error claros y personalizables.
+- Validación automática de tipos de datos.
+- Limpieza transparente del buffer de entrada.
+- Reintentos automáticos configurables en caso de error.
+- Protección contra desbordamiento de buffer (*Buffer Overflow*).
+- Mensajes de error claros y personalizables.
 
 ### Comparativa: Código Tradicional vs. `get-input.h`
 
 ```c
-// ❌ SIN get-input.h - Propenso a errores, desbordamiento y bucles infinitos
+// SIN get-input.h - Propenso a errores, desbordamiento y bucles infinitos
 int edad;
 do {
     printf("Edad: ");
@@ -42,7 +42,7 @@ do {
     }
 } while (edad < 0 || edad > 120);
 
-// ✅ CON get-input.h - Una sola línea limpia, segura y validada
+// CON get-input.h - Una sola línea limpia, segura y validada
 int edad = obtener_entero_rango("Edad: ", 0, 120);
 ```
 
@@ -64,7 +64,7 @@ static inline void _limpiar_buffer(void) {
 ```c
 static inline void _mostrar_error(const char *mensaje, int mostrar) {
     if (mostrar) {
-        fprintf(stderr, "  ❌ %s\n", mensaje);
+        fprintf(stderr, "  Error: %s\n", mensaje);
     }
 }
 ```
@@ -80,8 +80,8 @@ Para lecturas con reglas avanzadas, la biblioteca expone 4 estructuras de config
 ### 3.1 `ConfigEntero`
 ```c
 typedef struct {
-    int min;           // Valor mínimo permitido (inclusive)
-    int max;           // Valor máximo permitido (inclusive)
+    int min;           // Valor entero mínimo permitido (inclusive)
+    int max;           // Valor entero máximo permitido (inclusive)
     int reintentos;    // Número de reintentos (-1 = infinito)
     int mostrar_error; // Mostrar mensajes de error (1/0)
 } ConfigEntero;
@@ -121,13 +121,13 @@ typedef struct {
 
 ## 4. Análisis de Elementos Opcionales vs Obligatorios
 
-| Elemento | Obligatorio u Opcional | Razón y Explicación Térmica |
+| Elemento | Obligatorio u Opcional | Razón y Explicación Técnica |
 |----------|-------------------------|-----------------------------|
-| **`tamanio` en Cadenas** | 🛑 **OBLIGATORIO** | Al manipular cadenas en C, pasar el tamaño real del arreglo (`sizeof(buffer)`) es indispensable para evitar que `fgets()` escriba más allá de la memoria asignada (*Buffer Overflow*). |
-| **Estructuras `Config...`** | 💡 **OPCIONAL** | No estás obligado a crear estas estructuras manualmente. Funciones como `obtener_entero()`, `obtener_entero_rango()`, `obtener_cadena()`, etc., las generan automáticamente usando valores por defecto. |
-| **Límite de `reintentos`** | 💡 **OPCIONAL** | Por defecto vale `-1` (reintentos infinitos). Esto es ideal para consolas interactivas donde se desea insistir hasta obtener un valor válido. Solo se especifica un número (ej. `3`) en casos de seguridad (ej. PINs). |
-| **Flag `mostrar_error`** | 💡 **OPCIONAL** | Por defecto es `1` (activo). Puede cambiarse a `0` si deseas validar datos de forma silenciosa o construir tu propia interfaz gráfica/TUI. |
-| **Macros (`INPUT_INT`, etc.)** | 💡 **OPCIONAL** | Son azúcar sintáctica para programadores que buscan escribir código más compacto. |
+| **`tamanio` en Cadenas** | **OBLIGATORIO** | Al manipular cadenas en C, pasar el tamaño real del arreglo (`sizeof(buffer)`) es indispensable para evitar que `fgets()` escriba más allá de la memoria asignada (*Buffer Overflow*). |
+| **Estructuras `Config...`** | **OPCIONAL** | No estás obligado a crear estas estructuras manualmente. Funciones como `obtener_entero()`, `obtener_entero_rango()`, `obtener_cadena()`, etc., las generan automáticamente usando valores por defecto. |
+| **Límite de `reintentos`** | **OPCIONAL** | Por defecto vale `-1` (reintentos infinitos). Esto es ideal para consolas interactivas donde se desea insistir hasta obtener un valor válido. Solo se especifica un número (ej. `3`) en casos de seguridad (ej. PINs). |
+| **Flag `mostrar_error`** | **OPCIONAL** | Por defecto es `1` (activo). Puede cambiarse a `0` si deseas validar datos de forma silenciosa o construir tu propia interfaz gráfica/TUI. |
+| **Macros (`INPUT_INT`, etc.)** | **OPCIONAL** | Son azúcar sintáctica para programadores que buscan escribir código más compacto. |
 
 ---
 
@@ -273,9 +273,9 @@ int main(void) {
     obtener_telefono("Teléfono (dígitos): ", telefono, sizeof(telefono));
 
     if (obtener_si_no("¿Aceptas los términos y condiciones?")) {
-        printf("\n✅ Registro finalizado con éxito para %s.\n", nombre);
+        printf("\n[OK] Registro finalizado con éxito para %s.\n", nombre);
     } else {
-        printf("\n❌ Registro cancelado.\n");
+        printf("\n[CANCELADO] Registro cancelado.\n");
     }
 
     return 0;

@@ -18,16 +18,16 @@ $(BIN_DIR)/%: $(EXAMPLES_DIR)/%.c get-input.h
 	$(CC) $(CFLAGS) $< -o $@
 
 install:
-	@echo "📦 Instalando get-input.h en $(PREFIX)/include..."
+	@echo "Instalando get-input.h en $(PREFIX)/include..."
 	@sudo mkdir -p $(PREFIX)/include
 	@sudo cp get-input.h $(PREFIX)/include/
-	@echo "✅ Instalado en $(PREFIX)/include/get-input.h"
-	@echo "📝 Ahora puedes usar: #include <get-input.h>"
+	@echo "Instalado en $(PREFIX)/include/get-input.h"
+	@echo "Ahora puedes usar: #include <get-input.h>"
 
 uninstall:
-	@echo "🗑️ Desinstalando get-input.h de $(PREFIX)/include..."
+	@echo "Desinstalando get-input.h de $(PREFIX)/include..."
 	@sudo rm -f $(PREFIX)/include/get-input.h
-	@echo "✅ get-input.h desinstalado con éxito"
+	@echo "get-input.h desinstalado con éxito"
 
 clean:
 	rm -rf $(BIN_DIR)

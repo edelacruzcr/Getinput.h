@@ -24,9 +24,9 @@ int main(void) {
     // Confirmación Sí / No
     int aceptar = obtener_si_no("¿Deseas guardar los cambios realizados?");
     if (aceptar) {
-        printf("✅ Cambios guardados con éxito.\n");
+        printf("[OK] Cambios guardados con éxito.\n");
     } else {
-        printf("❌ Operación cancelada por el usuario.\n");
+        printf("[CANCELADO] Operación cancelada por el usuario.\n");
     }
 
     return 0;

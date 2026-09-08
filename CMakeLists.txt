@@ -5,5 +5,5 @@ project(get-input VERSION 2.0.0 LANGUAGES C)
 install(FILES get-input.h DESTINATION /usr/local/include)
 
 # Mensaje informativo
-message(STATUS "✅ get-input.h preparado para instalación en /usr/local/include")
-message(STATUS "📝 Usa: #include <get-input.h>")
+message(STATUS "get-input.h preparado para instalación en /usr/local/include")
+message(STATUS "Usa: #include <get-input.h>")
