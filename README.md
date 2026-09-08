@@ -6,94 +6,94 @@
 [![Tipo](https://img.shields.io/badge/Tipo-Header--Only-purple.svg)](get-input.h)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](Makefile)
 
-**`get-input.h`** es una biblioteca *Header-Only* liviana, moderna y segura para lenguaje C. Soluciona de manera definitiva los problemas tradicionales al solicitar datos por consola (`stdin`), eliminando desbordamientos de memoria (*Buffer Overflow*), bucles infinitos por entradas inválidas y caracteres residuales en la consola.
+**`get-input.h`** es una biblioteca **header-only** para lenguaje C que simplifica la entrada de datos del usuario por consola (`stdin`), haciendo que sea **segura, robusta y fácil de usar**.
 
 ---
 
-## 📋 Tabla de Contenidos
-1. [Introducción y Comparativa](#1-introducción-y-comparativa)
-2. [Instalación e Inclusión](#2-instalación-e-inclusión)
-3. [Compilación](#3-compilación)
-4. [Tipos de Datos y Estructuras de Configuración](#4-tipos-de-datos-y-estructuras-de-configuración)
-5. [Análisis de Elementos Opcionales vs. Obligatorios](#5-análisis-de-elementos-opcionales-vs-obligatorios)
-6. [Funcionamiento Interno e Higiene de Buffer](#6-funcionamiento-interno-e-higiene-de-buffer)
-7. [Catálogo Completo de Funciones](#7-catálogo-completo-de-funciones)
-   - [Funciones de Caracteres](#71-funciones-de-caracteres)
-   - [Funciones de Enteros](#72-funciones-de-enteros)
-   - [Funciones de Flotantes](#73-funciones-de-flotantes)
-   - [Funciones de Cadenas de Texto](#74-funciones-de-cadenas-de-texto)
-   - [Funciones de Confirmación y Dominio (Email/Teléfono/Menú)](#75-funciones-de-confirmación-y-dominio-emailteléfonomenú)
-   - [Funciones de Validación Manual](#76-funciones-de-validación-manual)
-8. [Macros Útiles](#8-macros-útiles)
-9. [Ejemplos Prácticos Completos](#9-ejemplos-prácticos-completos)
-10. [Tabla de Referencia Rápida](#10-tabla-de-referencia-rápida)
-11. [Licencia](#11-licencia)
+## 🎯 ¿Qué problema resuelve?
 
----
-
-## 1. Introducción y Comparativa
-
-### ¿Por qué usar `get-input.h`?
-
-En C tradicional, leer datos por teclado suele requerir código repetitivo para vaciar `stdin`, validar tipos e intentar de nuevo cuando el usuario ingresa texto inválido.
+### El problema en C tradicional:
 
 ```c
-// ❌ C TRADICIONAL - Código verbose, propenso a desbordamientos y bucles infinitos
+// ❌ Código complicado y peligroso (propenso a desbordamiento y bucles infinitos)
 int edad;
-do {
-    printf("Ingresa tu edad (0-120): ");
-    if (scanf("%d", &edad) != 1) {
-        while (getchar() != '\n'); // Limpiar buffer manualmente
-        printf(" Error: Entrada no numérica.\n");
-        continue;
-    }
-} while (edad < 0 || edad > 120);
-
-// ✅ CON get-input.h - Legible, seguro, robusto y validado en una sola línea
-int edad = obtener_entero_rango("Ingresa tu edad (0-120): ", 0, 120);
-```
-
----
-
-## 2. Instalación e Inclusión
-
-Dado que `get-input.h` es una biblioteca **Header-Only** (consta de un único archivo de cabecera C), **no requiere instalación previa ni enlace de bibliotecas dinámicas**.
-
-### Paso 1: Clonar o Descargar
-
-```bash
-git clone https://github.com/edelacruzcr/Getinput.h.git
-```
-
-O simplemente copia el archivo [`get-input.h`](get-input.h) en el directorio de tu proyecto.
-
-### Paso 2: Incluir en tu archivo C
-
-```c
-#include <stdio.h>
-#include "get-input.h" // Incluir la biblioteca
-
-int main(void) {
-    int edad = obtener_entero("Ingresa tu edad: ");
-    printf("Tienes %d años.\n", edad);
-    return 0;
+printf("Edad: ");
+if (scanf("%d", &edad) != 1) {
+    while(getchar() != '\n'); // Limpiar buffer
+    printf("Error\n");
 }
 ```
 
+### La solución con `get-input.h`:
+
+```c
+// ✅ Simple, seguro y validado en una sola línea
+int edad = obtener_entero_rango("Edad: ", 0, 120);
+```
+
 ---
 
-## 3. Compilación
+## 🔧 Características Principales
 
-Puedes compilar tus programas con cualquier compilador estándar de C (**C99, C11, C17 o C23**) como GCC, Clang o MSVC:
+| Característica | Descripción |
+|----------------|-------------|
+| **Header-Only** | Solo un archivo `.h`, no necesita compilación separada |
+| **Seguro** | Protege contra desbordamientos de buffer (*Buffer Overflow*) |
+| **Robusto** | Maneja entradas inválidas automáticamente |
+| **Configurable** | Límites, reintentos, mensajes de error |
+| **Multiplataforma** | Funciona en Linux, macOS, Windows |
+| **Sin dependencias** | Solo usa la biblioteca estándar de C |
 
-### Uso con GCC / Clang
+---
+
+## 📦 Instalación e Inclusión
+
+Dado que `get-input.h` es una biblioteca **Header-Only**, no requiere compilación previa ni enlazado de bibliotecas adicionales.
+
+### 1. Instalación Global (Disponible en todo el sistema)
+
+Copia el archivo a la ruta de inclusión del sistema:
+
+```bash
+sudo cp get-input.h /usr/local/include/
+```
+
+Y en tu código de C inclúyelo con corchetes angular:
+```c
+#include <get-input.h>
+```
+
+---
+
+### 2. Instalación Local (Por Proyecto)
+
+Copia el archivo `get-input.h` a tu proyecto o carpeta de cabeceras:
+
+```bash
+mkdir -p include
+cp get-input.h include/
+```
+
+Y en tu código inclúyelo con comillas:
+```c
+#include "get-input.h"       // Si está en el mismo directorio
+// o bien:
+#include "include/get-input.h" // Si está en la carpeta include/
+```
+
+---
+
+## ⚙️ Compilación
+
+Puedes compilar tus archivos C usando cualquier compilador estándar (GCC, Clang, MSVC) sin librerías extra:
+
 ```bash
 gcc -Wall -Wextra -std=c99 main.c -o programa
 ./programa
 ```
 
 ### Compilar los Ejemplos del Repositorio
-El repositorio incluye un `Makefile` para compilar automáticamente todos los ejemplos incluidos en `examples/`:
+El repositorio incluye un `Makefile` para compilar los ejemplos en `examples/`:
 
 ```bash
 make
@@ -105,213 +105,139 @@ make
 
 ---
 
-## 4. Tipos de Datos y Estructuras de Configuración
+## 📐 Estructuras de Configuración
 
-Para configuraciones avanzadas (límites de reintentos, visibilidad de errores o intervalos específicos), la biblioteca expone 4 estructuras:
-
-### 4.1 `ConfigEntero`
 ```c
+// Configuración para enteros
 typedef struct {
-    int min;           // Valor entero mínimo permitido (inclusive)
-    int max;           // Valor entero máximo permitido (inclusive)
-    int reintentos;    // Número máximo de reintentos (-1 = infinito)
-    int mostrar_error; // Activar mensajes de error en stderr (1 = sí, 0 = silencioso)
+    int min;           // Valor mínimo permitido
+    int max;           // Valor máximo permitido
+    int reintentos;    // Intentos permitidos (-1 = infinito)
+    int mostrar_error; // Mostrar errores (1 = sí, 0 = silencioso)
 } ConfigEntero;
-```
 
-### 4.2 `ConfigFlotante`
-```c
+// Configuración para flotantes
 typedef struct {
     double min;        // Valor mínimo permitido
     double max;        // Valor máximo permitido
-    int reintentos;    // Número máximo de reintentos (-1 = infinito)
-    int mostrar_error; // Activar mensajes de error (1/0)
+    int reintentos;    // Intentos permitidos
+    int mostrar_error; // Mostrar errores
 } ConfigFlotante;
-```
 
-### 4.3 `ConfigString`
-```c
+// Configuración para cadenas de texto
 typedef struct {
-    int min_longitud;  // Longitud mínima requerida
-    int max_longitud;  // Longitud máxima permitida
-    int permitir_vacio;// Permitir cadena vacía "" (1 = sí, 0 = no)
-    int reintentos;    // Número máximo de reintentos (-1 = infinito)
-    int mostrar_error; // Activar mensajes de error (1/0)
+    int min_longitud;  // Longitud mínima
+    int max_longitud;  // Longitud máxima
+    int permitir_vacio;// Permitir cadena vacía (1/0)
+    int reintentos;    // Intentos permitidos
+    int mostrar_error; // Mostrar errores
 } ConfigString;
-```
 
-### 4.4 `ConfigCaracter`
-```c
+// Configuración para caracteres
 typedef struct {
-    char opciones[256]; // Cadena con caracteres permitidos (ej. "ABC")
-    int reintentos;     // Número máximo de reintentos (-1 = infinito)
-    int mostrar_error;  // Activar mensajes de error (1/0)
+    char opciones[256]; // Caracteres permitidos (ej. "ABC")
+    int reintentos;     // Intentos permitidos
+    int mostrar_error;  // Mostrar errores
 } ConfigCaracter;
 ```
 
 ---
 
-## 5. Análisis de Elementos Opcionales vs. Obligatorios
+## 💡 Elementos Opcionales vs. Obligatorios
 
-| Parámetro / Elemento | Obligatorio u Opcional | Razón y Explicación Técnica |
-|----------------------|-------------------------|-----------------------------|
-| **`tamanio` en Cadenas** | 🛑 **OBLIGATORIO** | En lenguaje C, indicar la capacidad máxima de memoria asignada al arreglo (`sizeof(buffer)`) es indispensable para que `fgets()` detenga la lectura y evite desbordamientos de memoria (*Buffer Overflow*). |
-| **Estructuras `Config...`** | 💡 **OPCIONAL** | No es necesario declararlas manualmente en lecturas sencillas. Funciones como `obtener_entero()`, `obtener_entero_rango()`, `obtener_cadena()`, etc., instancian configuraciones por defecto (`CONFIG_ENTERO_DEFAULT`, etc.). |
-| **Límite de `reintentos`** | 💡 **OPCIONAL** | Por defecto vale `-1` (reintentos ilimitados). Esto es ideal para consolas interactivas donde se desea solicitar el dato hasta que sea correcto. Solo se cambia a un valor entero (ej. `3`) para casos de seguridad (ej. ingresar un PIN). |
-| **Flag `mostrar_error`** | 💡 **OPCIONAL** | Por defecto es `1` (imprime alertas con `❌`). Si se asigna `0`, la lectura es silenciosa sin imprimir mensajes adicionales. |
-| **Macros (`INPUT_INT`, etc.)** | 💡 **OPCIONAL** | Azúcar sintáctica diseñada para simplificar el código. |
+- 🛑 **Buffer y Tamaño (`tamanio`)**: **Obligatorio** en lectura de cadenas (ej. `obtener_cadena(msg, buf, sizeof(buf))`). Esto le indica a `fgets()` la capacidad máxima de memoria para evitar desbordamientos.
+- 💡 **Estructuras `Config...`**: **Opcional**. Si usas funciones simples como `obtener_entero()` o `obtener_cadena()`, la biblioteca aplicará valores por defecto automáticamente.
+- 💡 **Reintentos (`reintentos`)**: **Opcional**. Por defecto vale `-1` (reintentos infinitos). Se modifica solo en casos de seguridad (ej. 3 intentos para un PIN).
+- 💡 **Mensajes de error (`mostrar_error`)**: **Opcional**. Por defecto es `1`. Puedes cambiarlo a `0` para operaciones silenciosas.
 
 ---
 
-## 6. Funcionamiento Interno e Higiene de Buffer
+## 📚 Guía de Funciones
 
-### 6.1 `_limpiar_buffer(void)`
+### 1. Funciones de Caracteres
 ```c
-static inline void _limpiar_buffer(void) {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) {}
-}
-```
-* **Propósito**: Vacía los caracteres sobrantes de `stdin`.
-* **Explicación**: Cuando un usuario ingresa una cadena o número largo y presiona Enter (`\n`), los caracteres no procesados permanecen atrapados en el flujo de entrada. `_limpiar_buffer()` garantiza que las lecturas siguientes no lean basura previa.
+// Leer cualquier carácter
+char c = obtener_caracter("Escribe algo: ");
 
-### 6.2 `_mostrar_error(const char *mensaje, int mostrar)`
-```c
-static inline void _mostrar_error(const char *mensaje, int mostrar) {
-    if (mostrar) {
-        fprintf(stderr, "  ❌ %s\n", mensaje);
-    }
-}
-```
-* **Propósito**: Imprime alertas formateadas en el canal de errores estándar `stderr`.
+// Leer restringido a opciones
+char c = obtener_caracter_opciones("Elige (A/B/C): ", "ABC");
 
----
-
-## 7. Catálogo Completo de Funciones
-
-### 7.1 Funciones de Caracteres
-
-#### `obtener_caracter(const char *mensaje)`
-Lee un único carácter del usuario.
-```c
-char c = obtener_caracter("Presiona una tecla: ");
+// Leer con configuración personalizada
+ConfigCaracter config = { .opciones = "SI", .reintentos = 3, .mostrar_error = 1 };
+char c = obtener_caracter_config("¿Continuar? (S/N): ", config);
 ```
 
-#### `obtener_caracter_opciones(const char *mensaje, const char *opciones)`
-Lee un carácter restringido a las alternativas incluidas en `opciones`.
+### 2. Funciones de Enteros
 ```c
-char opcion = obtener_caracter_opciones("Selecciona (A/B/C): ", "ABC");
+// Leer cualquier entero
+int num = obtener_entero("Número: ");
+
+// Leer en un rango determinado
+int edad = obtener_entero_rango("Edad (0-120): ", 0, 120);
+
+// Leer con configuración avanzada
+ConfigEntero config = { .min = 18, .max = 65, .reintentos = 3, .mostrar_error = 1 };
+int edad = obtener_entero_config("Edad (18-65): ", config);
 ```
 
-#### `obtener_caracter_config(const char *mensaje, ConfigCaracter config)`
-Versión avanzada con estructura de configuración.
-
----
-
-### 7.2 Funciones de Enteros
-
-#### `obtener_entero(const char *mensaje)`
-Lee cualquier número entero válido dentro del rango soportado por `int`.
+### 3. Funciones de Flotantes
 ```c
-int numero = obtener_entero("Ingresa un número: ");
-```
-
-#### `obtener_entero_rango(const char *mensaje, int min, int max)`
-Lee un entero obligatoriamente comprendido entre `min` y `max`.
-```c
-int nota = obtener_entero_rango("Ingresa la nota (0-10): ", 0, 10);
-```
-
-#### `obtener_entero_config(const char *mensaje, ConfigEntero config)`
-Versión avanzada con estructura de configuración.
-
----
-
-### 7.3 Funciones de Flotantes
-
-#### `obtener_flotante(const char *mensaje)`
-Lee un número decimal (`float`).
-```c
+// Leer cualquier flotante
 float precio = obtener_flotante("Precio: ");
+
+// Leer con rango
+float temp = obtener_flotante_rango("Temp (-10 a 40): ", -10.0f, 40.0f);
+
+// Leer con configuración
+ConfigFlotante config = { .min = 0.0, .max = 10.0, .reintentos = 5, .mostrar_error = 0 };
+float nota = obtener_flotante_config("Nota: ", config);
 ```
 
-#### `obtener_flotante_rango(const char *mensaje, float min, float max)`
-Lee un decimal delimitado entre un rango mínimo y máximo.
+### 4. Funciones de Cadenas
 ```c
-float temp = obtener_flotante_rango("Temperatura (-10.0 a 45.0): ", -10.0f, 45.0f);
-```
-
-#### `obtener_flotante_config(const char *mensaje, ConfigFlotante config)`
-Versión avanzada con configuración personalizada.
-
----
-
-### 7.4 Funciones de Cadenas de Texto
-
-#### `obtener_cadena(const char *mensaje, char *buffer, int tamanio)`
-Lee una línea de texto completa (incluyendo espacios) de manera segura.
-```c
+// Leer texto con espacios (seguro contra desbordamientos)
 char nombre[50];
-obtener_cadena("Nombre completo: ", nombre, sizeof(nombre));
+obtener_cadena("Nombre: ", nombre, sizeof(nombre));
+
+// Leer con longitud mínima requerida
+char pass[50];
+obtener_cadena_min("Contraseña (mín 8): ", pass, sizeof(pass), 8);
+
+// Leer con configuración
+ConfigString config = { .min_longitud = 3, .max_longitud = 20, .permitir_vacio = 0, .reintentos = 3, .mostrar_error = 1 };
+char usuario[50];
+obtener_cadena_config("Usuario: ", usuario, sizeof(usuario), config);
 ```
 
-#### `obtener_cadena_min(const char *mensaje, char *buffer, int tamanio, int min_longitud)`
-Exige una longitud mínima de caracteres antes de aceptar la entrada.
+### 5. Funciones Especiales (Email, Teléfono, Menú, Confirmación)
 ```c
-char clave[64];
-obtener_cadena_min("Crea una contraseña (mín 8 caracteres): ", clave, sizeof(clave), 8);
-```
-
-#### `obtener_cadena_config(const char *mensaje, char *buffer, int tamanio, ConfigString config)`
-Versión avanzada con configuración completa.
-
----
-
-### 7.5 Funciones de Confirmación y Dominio (Email/Teléfono/Menú)
-
-#### `obtener_si_no(const char *mensaje)`
-Muestra la sugerencia `(s/n)` y retorna `1` para respuestas afirmativas (`'s'`, `'y'`) o `0` para negativas (`'n'`).
-```c
-if (obtener_si_no("¿Deseas guardar las modificaciones?")) {
-    printf("Guardado exitoso.\n");
+// Confirmación Sí / No
+if (obtener_si_no("¿Deseas continuar?")) {
+    printf("Continuando...\n");
 }
-```
 
-#### `obtener_email(const char *mensaje, char *buffer, int tamanio)`
-Solicita y valida la estructura básica de un correo (presencia de `@` y `.`).
-```c
-char correo[100];
-obtener_email("Ingresa tu correo: ", correo, sizeof(correo));
-```
+// Email (valida @ y .)
+char email[100];
+obtener_email("Email: ", email, sizeof(email));
 
-#### `obtener_telefono(const char *mensaje, char *buffer, int tamanio)`
-Solicita y valida un número de teléfono de 7 a 15 caracteres numéricos.
-```c
+// Teléfono (solo dígitos)
 char telefono[20];
-obtener_telefono("Ingresa tu número telefónico: ", telefono, sizeof(telefono));
+obtener_telefono("Teléfono: ", telefono, sizeof(telefono));
+
+// Opción de menú numérico
+int opcion = obtener_opcion_menu("Selecciona (1-4): ", 1, 4);
 ```
 
-#### `obtener_opcion_menu(const char *mensaje, int min, int max)`
-Obtiene la opción seleccionada de un menú interactivo.
+### 6. Funciones de Validación Manual
 ```c
-int opcion = obtener_opcion_menu("Selecciona una opción (1-4): ", 1, 4);
+if (validar_no_vacio(nombre)) { printf("Nombre no vacío\n"); }
+if (validar_rango(edad, 0, 120)) { printf("Edad en rango\n"); }
+if (validar_email(email)) { printf("Formato de email correcto\n"); }
 ```
 
 ---
 
-### 7.6 Funciones de Validación Manual
-
-Permiten validar variables o cadenas en memoria sin realizar lecturas directas por consola:
-
-```c
-int ok1 = validar_no_vacio(cadena);       // Retorna 1 si la cadena no es NULL ni vacía
-int ok2 = validar_rango(valor, min, max); // Retorna 1 si el valor está en el rango
-int ok3 = validar_email(correo);          // Retorna 1 si la cadena tiene formato de email
-```
-
----
-
-## 8. Macros Útiles
+## ⚡ Macros Útiles
 
 ```c
 #define INPUT_INT(msg) obtener_entero(msg)
@@ -322,90 +248,128 @@ int ok3 = validar_email(correo);          // Retorna 1 si la cadena tiene format
 #define INPUT_CHAR(msg) obtener_caracter(msg)
 ```
 
+**Ejemplo:**
+```c
+int edad = INPUT_INT("Edad: ");
+char nombre[50];
+INPUT_STR("Nombre: ", nombre, sizeof(nombre));
+if (INPUT_YES_NO("¿Aceptas?")) {
+    printf("Bienvenido\n");
+}
+```
+
 ---
 
-## 9. Ejemplos Prácticos Completos
+## 💡 Ejemplo Completo de Formulario
 
-### Ejemplo 1: Formulario de Registro de Usuario
 ```c
 #include <stdio.h>
-#include "get-input.h"
+#include "get-input.h" // o <get-input.h> si lo instalaste globalmente
 
 int main(void) {
     printf("=== REGISTRO DE USUARIO ===\n\n");
-
+    
+    // 1. Nombre completo (mínimo 2 caracteres)
     char nombre[50];
     obtener_cadena_min("Nombre completo: ", nombre, sizeof(nombre), 2);
-
-    int edad = obtener_entero_rango("Edad (18-99): ", 18, 99);
-
-    char correo[100];
-    obtener_email("Correo electrónico: ", correo, sizeof(correo));
-
-    char clave[64];
-    obtener_cadena_min("Contraseña (mínimo 8 caracteres): ", clave, sizeof(clave), 8);
-
+    
+    // 2. Edad (0-120)
+    int edad = obtener_entero_rango("Edad (0-120): ", 0, 120);
+    
+    // 3. Email (validado)
+    char email[100];
+    obtener_email("Correo electrónico: ", email, sizeof(email));
+    
+    // 4. Teléfono (solo dígitos)
+    char telefono[20];
+    obtener_telefono("Teléfono: ", telefono, sizeof(telefono));
+    
+    // 5. Contraseña (mínimo 8 caracteres)
+    char pass[50];
+    obtener_cadena_min("Contraseña (mín 8): ", pass, sizeof(pass), 8);
+    
+    // 6. Confirmación
     if (obtener_si_no("¿Confirmas el registro?")) {
         printf("\n✅ Usuario %s registrado correctamente.\n", nombre);
+        printf("📧 Email: %s\n", email);
+        printf("📱 Teléfono: %s\n", telefono);
     } else {
-        printf("\n❌ Operación cancelada.\n");
+        printf("\n❌ Registro cancelado.\n");
     }
-
+    
     return 0;
 }
 ```
 
-### Ejemplo 2: Menú Interactivo de Consola
+---
+
+## 📊 Tabla de Funciones
+
+| Función | Parámetros | Retorna | Descripción |
+|---------|------------|---------|-------------|
+| `obtener_caracter` | `mensaje` | `char` | Lee un carácter |
+| `obtener_caracter_opciones` | `mensaje, opciones` | `char` | Lee carácter con opciones |
+| `obtener_entero` | `mensaje` | `int` | Lee entero |
+| `obtener_entero_rango` | `mensaje, min, max` | `int` | Lee entero en rango |
+| `obtener_flotante` | `mensaje` | `float` | Lee flotante |
+| `obtener_flotante_rango` | `mensaje, min, max` | `float` | Lee flotante en rango |
+| `obtener_cadena` | `mensaje, buffer, tamaño` | `void` | Lee cadena |
+| `obtener_cadena_min` | `mensaje, buffer, tamaño, min` | `int` | Lee cadena con mínimo |
+| `obtener_si_no` | `mensaje` | `int` | Lee sí/no |
+| `obtener_email` | `mensaje, buffer, tamaño` | `int` | Lee y valida email |
+| `obtener_telefono` | `mensaje, buffer, tamaño` | `int` | Lee y valida teléfono |
+| `obtener_opcion_menu` | `mensaje, min, max` | `int` | Lee opción de menú |
+| `validar_no_vacio` | `texto` | `int` | Valida no vacío |
+| `validar_rango` | `valor, min, max` | `int` | Valida rango |
+| `validar_email` | `email` | `int` | Valida email |
+
+---
+
+## 🎯 ¿Cuándo Usar Cada Función?
+
+| Situación | Función Sugerida |
+|-----------|------------------|
+| **Una letra** | `obtener_caracter()` |
+| **Una letra con opciones** | `obtener_caracter_opciones()` |
+| **Un número cualquiera** | `obtener_entero()` |
+| **Un número en rango** | `obtener_entero_rango()` |
+| **Un número decimal** | `obtener_flotante()` |
+| **Un número decimal en rango** | `obtener_flotante_rango()` |
+| **Un texto con espacios** | `obtener_cadena()` |
+| **Un texto con longitud mínima** | `obtener_cadena_min()` |
+| **Confirmación sí/no** | `obtener_si_no()` |
+| **Email validado** | `obtener_email()` |
+| **Teléfono validado** | `obtener_telefono()` |
+| **Opción de menú** | `obtener_opcion_menu()` |
+
+---
+
+## ⭐ Ventajas
+
+1. 🛡️ **Seguro**: Protege contra desbordamientos de buffer.
+2. 🔄 **Robusto**: Maneja entradas inválidas y limpia `stdin`.
+3. ⚡ **Simple**: Una sola línea para cada operación.
+4. ⚙️ **Configurable**: Límites, reintentos y control de errores.
+5. 🌐 **Portable**: Funciona en Linux, macOS y Windows.
+6. 📦 **Header-only**: Un solo archivo de cabecera.
+7. 📖 **Documentado**: Funciones explicadas y con ejemplos claros.
+
+---
+
+## 🎉 ¡Listo para Usar!
+
 ```c
-#include <stdio.h>
-#include "get-input.h"
+#include "get-input.h"   // ¡Así de simple!
 
 int main(void) {
-    int continuar = 1;
-
-    while (continuar) {
-        printf("\n=== MENÚ PRINCIPAL ===\n");
-        printf("1. Ver perfil\n");
-        printf("2. Cambiar contraseña\n");
-        printf("3. Salir\n");
-
-        int opcion = obtener_opcion_menu("Elige una opción (1-3): ", 1, 3);
-
-        switch (opcion) {
-            case 1: printf("Mostrando perfil...\n"); break;
-            case 2: printf("Modificando contraseña...\n"); break;
-            case 3: 
-                if (obtener_si_no("¿Seguro que deseas salir?")) {
-                    continuar = 0;
-                }
-                break;
-        }
-    }
+    int edad = obtener_entero_rango("Edad (0-120): ", 0, 120);
+    printf("Edad: %d años\n", edad);
     return 0;
 }
 ```
 
 ---
 
-## 10. Tabla de Referencia Rápida
+## 📄 Licencia
 
-| Función | Firma / Parámetros | Retorno | Descripción Breve |
-|---------|--------------------|---------|-------------------|
-| `obtener_entero` | `(const char *mensaje)` | `int` | Lee un entero seguro. |
-| `obtener_entero_rango` | `(const char *mensaje, int min, int max)` | `int` | Lee un entero acotado por un rango. |
-| `obtener_flotante` | `(const char *mensaje)` | `float` | Lee un número flotante. |
-| `obtener_flotante_rango` | `(const char *mensaje, float min, float max)` | `float` | Lee un flotante en un rango. |
-| `obtener_cadena` | `(const char *mensaje, char *buffer, int tamanio)` | `void` | Lee una cadena sin desbordamiento. |
-| `obtener_cadena_min` | `(const char *msg, char *buf, int size, int min)` | `int` | Lee cadena asegurando longitud mínima. |
-| `obtener_caracter` | `(const char *mensaje)` | `char` | Lee un único carácter de teclado. |
-| `obtener_caracter_opciones` | `(const char *mensaje, const char *opciones)` | `char` | Lee un carácter restringido a opciones. |
-| `obtener_si_no` | `(const char *mensaje)` | `int` | Retorna `1` (sí) o `0` (no). |
-| `obtener_email` | `(const char *mensaje, char *buffer, int tamanio)` | `int` | Lee y valida correo electrónico. |
-| `obtener_telefono` | `(const char *mensaje, char *buffer, int tamanio)` | `int` | Lee y valida número telefónico. |
-| `obtener_opcion_menu` | `(const char *mensaje, int min, int max)` | `int` | Lee una opción entera de menú. |
-
----
-
-## 11. Licencia
-
-Este proyecto está distribuido bajo la [Licencia MIT](LICENSE). Libre para uso comercial, académico y personal.
+Este proyecto se distribuye bajo la [Licencia MIT](LICENSE). Libre para uso comercial, académico y personal.
