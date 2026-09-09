@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "arreglo.h"
+#include "util.h"
 
 int main(void) {
     char texto[] = "el sol brilla y el cielo es azul";

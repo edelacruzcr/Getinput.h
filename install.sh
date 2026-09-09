@@ -1,12 +1,12 @@
 #!/bin/bash
 # ============================================================
-# install.sh - Instalador automatico universal
-# Bibliotecas: get-input.h y arreglo.h
+# install.sh - Instalador automático universal
+# Biblioteca: util.h
 # ============================================================
 
 set -e
 
-echo "Instalando bibliotecas C (get-input.h, arreglo.h)..."
+echo "Instalando biblioteca C (util.h)..."
 
 # Detectar sistema operativo
 OS=$(uname -s 2>/dev/null || echo "Unknown")
@@ -33,7 +33,24 @@ case "$OS" in
         ;;
 esac
 
-ARCHIVOS=("get-input.h" "arreglo.h")
+# Limpiar versiones anteriores obsoletas si existen
+OLD_FILES=("$INSTALL_DIR/get-input.h" "$INSTALL_DIR/arreglo.h")
+for OLD_FILE in "${OLD_FILES[@]}"; do
+    if [ -f "$OLD_FILE" ]; then
+        echo "Eliminando cabecera antigua obsoleta: $OLD_FILE..."
+        if [ "$INSTALL_DIR" = "/usr/local/include" ] || [ "$INSTALL_DIR" = "/usr/include" ]; then
+            if [ "$(id -u)" -ne 0 ]; then
+                sudo rm -f "$OLD_FILE"
+            else
+                rm -f "$OLD_FILE"
+            fi
+        else
+            rm -f "$OLD_FILE"
+        fi
+    fi
+done
+
+ARCHIVOS=("util.h")
 
 for ARCHIVO in "${ARCHIVOS[@]}"; do
     # Verificar si el archivo existe localmente o descargarlo de GitHub
@@ -75,6 +92,5 @@ done
 
 echo ""
 echo "Instalacion completada con exito."
-echo "Ahora puedes incluir las bibliotecas en tus programas de C:"
-echo "   #include <get-input.h>"
-echo "   #include <arreglo.h>"
+echo "Ahora puedes incluir la biblioteca en tus programas de C:"
+echo "   #include <util.h>"

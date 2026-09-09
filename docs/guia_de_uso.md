@@ -1,302 +1,602 @@
-# GUÍA COMPLETA Y MANUAL DE FUNCIONES - `get-input.h`
+# GUÍA COMPLETA Y MANUAL DE REFERENCIA: `util.h`
+
+[![Versión](https://img.shields.io/badge/Versión-2.0.0-orange.svg)](util.h)
+[![Tamaño](https://img.shields.io/badge/Peso-28.9%20KB%20(28%2C907%20bytes)-blue.svg)](util.h)
+[![Líneas](https://img.shields.io/badge/Líneas-686-green.svg)](util.h)
+[![Tipo](https://img.shields.io/badge/Tipo-Header--Only-purple.svg)](util.h)
+
+---
 
 ## Índice
-1. [Introducción y Arquitectura](#1-introducción-y-arquitectura)
-2. [Funcionamiento Interno e Higiene de Buffer](#2-funcionamiento-interno-e-higiene-de-buffer)
-3. [Tipos de Datos y Estructuras](#3-tipos-de-datos-y-estructuras)
-4. [Análisis de Elementos Opcionales vs Obligatorios](#4-análisis-de-elementos-opcionales-vs-obligatorios)
-5. [Examen de Funciones de Carácter](#5-examen-de-funciones-de-carácter)
-6. [Examen de Funciones de Enteros](#6-examen-de-funciones-de-enteros)
-7. [Examen de Funciones de Flotantes](#7-examen-de-funciones-de-flotantes)
-8. [Examen de Funciones de Cadenas](#8-examen-de-funciones-de-cadenas)
-9. [Examen de Funciones de Confirmación y Dominio](#9-examen-de-funciones-de-confirmación-y-dominio)
-10. [Funciones de Validación Manual](#10-funciones-de-validación-manual)
-11. [Macros Útiles](#11-macros-útiles)
-12. [Ejemplos Prácticos Completos](#12-ejemplos-prácticos-completos)
-13. [Resumen Rápido de Referencia](#13-resumen-rápido-de-referencia)
+
+0. [Instalación y Desinstalación de Versiones Anteriores](#0-instalación-y-desinstalación-de-versiones-anteriores)
+1. [Especificaciones y Métricas Reales](#1-especificaciones-y-métricas-reales)
+2. [Arquitectura y Principios de Diseño](#2-arquitectura-y-principios-de-diseño)
+3. [Sección 1: Entrada de Datos y Validación por Consola](#3-sección-1-entrada-de-datos-y-validación-por-consola)
+   - [Estructuras de Configuración](#estructuras-de-configuración)
+   - [Funciones de Carácter](#funciones-de-carácter)
+   - [Funciones de Enteros](#funciones-de-enteros)
+   - [Funciones de Flotantes](#funciones-de-flotantes)
+   - [Funciones de Cadenas de Texto](#funciones-de-cadenas-de-texto)
+   - [Funciones de Confirmación y Dominio](#funciones-de-confirmación-y-dominio)
+   - [Validaciones Directas y Macros](#validaciones-directas-y-macros)
+4. [Sección 2: Arreglos Flexibles y Tablas Hash O(1)](#4-sección-2-arreglos-flexibles-y-tablas-hash-o1)
+   - [Estructuras de Datos](#estructuras-de-datos)
+   - [Creación y Destrucción](#creación-y-destrucción)
+   - [Inserción y Modificación](#inserción-y-modificación)
+   - [Búsqueda y Consulta](#búsqueda-y-consulta)
+   - [Eliminación e Inspección](#eliminación-e-inspección)
+   - [Operaciones Avanzadas (Copia, Mezcla, Orden)](#operaciones-avanzadas)
+   - [Macro de Iteración (`arreglo_recorrer`)](#macro-de-iteración)
+5. [Ejemplo Completo de Uso Integrado](#5-ejemplo-completo-de-uso-integrado)
 
 ---
 
-## 1. Introducción y Arquitectura
+## 0. Instalación y Desinstalación de Versiones Anteriores
 
-### ¿Qué es `get-input.h`?
+### Instalación Automática
+Para instalar o actualizar `util.h` en tu sistema (`/usr/local/include`):
 
-Es una biblioteca **header-only** en lenguaje C que **simplifica y asegura la entrada de datos por consola (`stdin`)**, solucionando automáticamente:
-- Validación automática de tipos de datos.
-- Limpieza transparente del buffer de entrada.
-- Reintentos automáticos configurables en caso de error.
-- Protección contra desbordamiento de buffer (*Buffer Overflow*).
-- Mensajes de error claros y personalizables.
+```bash
+curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/install.sh | bash
+```
 
-### Comparativa: Código Tradicional vs. `get-input.h`
+### Descarga Directa
+Para descargar únicamente `util.h` en la carpeta de tu proyecto:
 
+```bash
+curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/util.h -o util.h
+```
+
+### Código para Borrar Versión Anterior (`get-input.h` y `arreglo.h`)
+
+Si habías descargado o instalado la versión anterior de 2 archivos, puedes eliminarlos ejecutando:
+
+- **Globalmente en el sistema (`/usr/local/include`)**:
+  ```bash
+  sudo rm -f /usr/local/include/get-input.h /usr/local/include/arreglo.h
+  ```
+- **Localmente en tu carpeta de proyecto**:
+  ```bash
+  rm -f get-input.h arreglo.h
+  ```
+
+*(Nota: El script `install.sh` elimina automáticamente `get-input.h` y `arreglo.h` al ejecutarse).*
+
+---
+
+## 1. Especificaciones y Métricas Reales
+
+| Métrica | Valor Real |
+| :--- | :--- |
+| **Nombre del archivo** | `util.h` |
+| **Peso exacto en disco** | **28,907 bytes** (~28.9 KB) |
+| **Total de líneas de código** | **686 líneas** |
+| **Estándar C compatible** | C99, C11, C17, C23 |
+| **Dependencias externas** | Ninguna (solo bibliotecas estándar de C: `stdio`, `stdlib`, `string`, `stdbool`, `stdint`, `ctype`, `limits`, `errno`) |
+| **Modo de inclusión** | Header-Only (`static inline` para todas las funciones) |
+| **Total de funciones** | 40 funciones (19 de entrada + 21 de arreglo flexible) |
+
+---
+
+## 2. Arquitectura y Principios de Diseño
+
+`util.h` utiliza el patrón **Header-Only** mediante cualificadores `static inline`.
+
+### Beneficios Técnicos:
+1. **Inclusión sin conflictos**: Se puede incluir `#include "util.h"` en múltiples archivos `.c` de un mismo proyecto sin provocar errores de duplicación de símbolos en el enlazador (*linker duplicate symbols*).
+2. **Inlining del Compilador**: Al ser `static inline`, los compiladores modernos (`gcc`, `clang`, `msvc`) pueden insertar el código binario directamente en la llamada, eliminando la sobrecarga de salto de función.
+3. **Limpieza Automática de Buffer (`stdin`)**: Resuelve el problema común de caracteres residuales en `stdin` consumiendo el salto de línea `\n` sobrante.
+
+---
+
+## 3. Sección 1: Entrada de Datos y Validación por Consola
+
+### Estructuras de Configuración
+
+Permiten personalizar el comportamiento de lectura, límites de valores, cantidad de reintentos y visualización de errores.
+
+#### `ConfigEntero`
+- **Campos**:
+  - `int min`: Límite mínimo permitido.
+  - `int max`: Límite máximo permitido.
+  - `int reintentos`: Número máximo de reintentos (-1 para infinito).
+  - `int mostrar_error`: `1` para imprimir mensaje de error en `stderr`, `0` para modo silencioso.
+
+#### `ConfigFlotante`
+- **Campos**:
+  - `double min`: Límite mínimo permitido.
+  - `double max`: Límite máximo permitido.
+  - `int reintentos`: Número de reintentos (-1 para infinito).
+  - `int mostrar_error`: `1` activa errores, `0` los oculta.
+
+#### `ConfigString`
+- **Campos**:
+  - `int min_longitud`: Longitud mínima en caracteres.
+  - `int max_longitud`: Longitud máxima en caracteres.
+  - `int permitir_vacio`: `1` permite enter vacío `""`, `0` lo exige.
+  - `int reintentos`: Intentos máximos (-1 para infinito).
+  - `int mostrar_error`: `1` activa errores, `0` los oculta.
+
+#### `ConfigCaracter`
+- **Campos**:
+  - `char opciones[256]`: Cadena con caracteres aceptados (ej. `"abc"`). Si está vacía, acepta cualquier carácter.
+  - `int reintentos`: Intentos máximos (-1 para infinito).
+  - `int mostrar_error`: `1` activa errores, `0` los oculta.
+
+---
+
+### Funciones de Carácter
+
+#### 1. `obtener_caracter_config`
+- **¿Qué hace?**: Solicita un carácter con reglas de la estructura `ConfigCaracter`.
+- **¿Qué recibe?**:
+  - `const char *mensaje`: Prompt a mostrar al usuario.
+  - `ConfigCaracter config`: Estructura con restricciones.
+- **¿Qué devuelve?**: `char` leído o `'\0'` si se superan los reintentos.
+- **Ejemplo**:
+  ```c
+  ConfigCaracter cfg = {.opciones = "sSnN", .reintentos = 3, .mostrar_error = 1};
+  char opcion = obtener_caracter_config("¿Desea continuar? (s/n): ", cfg);
+  ```
+
+#### 2. `obtener_caracter`
+- **¿Qué hace?**: Solicita cualquier carácter sin restricciones.
+- **¿Qué recibe?**: `const char *mensaje`
+- **¿Qué devuelve?**: `char`
+- **Ejemplo**:
+  ```c
+  char tecla = obtener_caracter("Presione una tecla: ");
+  ```
+
+#### 3. `obtener_caracter_opciones`
+- **¿Qué hace?**: Solicita un carácter restringido a una lista de opciones.
+- **¿Qué recibe?**:
+  - `const char *mensaje`: Prompt al usuario.
+  - `const char *opciones`: Cadena con caracteres permitidos (ej. `"ABC"`).
+- **¿Qué devuelve?**: `char` válido.
+- **Ejemplo**:
+  ```c
+  char menu = obtener_caracter_opciones("Seleccione [A, B, C]: ", "ABCabc");
+  ```
+
+---
+
+### Funciones de Enteros
+
+#### 4. `obtener_entero_config`
+- **¿Qué hace?**: Lee un número entero de consola aplicando las reglas de `ConfigEntero`.
+- **¿Qué recibe?**:
+  - `const char *mensaje`: Prompt al usuario.
+  - `ConfigEntero config`: Configuración con rangos y reintentos.
+- **¿Qué devuelve?**: `int` validado.
+- **Ejemplo**:
+  ```c
+  ConfigEntero cfg = {.min = 1, .max = 10, .reintentos = 5, .mostrar_error = 1};
+  int num = obtener_entero_config("Nota (1-10): ", cfg);
+  ```
+
+#### 5. `obtener_entero`
+- **¿Qué hace?**: Lee un entero cualquiera (entre `INT_MIN` e `INT_MAX`).
+- **¿Qué recibe?**: `const char *mensaje`
+- **¿Qué devuelve?**: `int`
+- **Ejemplo**:
+  ```c
+  int cantidad = obtener_entero("Ingrese la cantidad: ");
+  ```
+
+#### 6. `obtener_entero_rango`
+- **¿Qué hace?**: Lee un entero obligatoriamente entre `min` y `max`.
+- **¿Qué recibe?**:
+  - `const char *mensaje`: Prompt al usuario.
+  - `int min`: Límite inferior.
+  - `int max`: Límite superior.
+- **¿Qué devuelve?**: `int` dentro del rango especificado.
+- **Ejemplo**:
+  ```c
+  int mes = obtener_entero_rango("Mes de nacimiento (1-12): ", 1, 12);
+  ```
+
+---
+
+### Funciones de Flotantes
+
+#### 7. `obtener_flotante_config`
+- **¿Qué hace?**: Lee un decimal (`double`) según la configuración `ConfigFlotante`.
+- **¿Qué recibe?**: `const char *mensaje`, `ConfigFlotante config`
+- **¿Qué devuelve?**: `double` validado.
+- **Ejemplo**:
+  ```c
+  ConfigFlotante cfg = {.min = 0.0, .max = 100.0, .reintentos = -1, .mostrar_error = 1};
+  double precio = obtener_flotante_config("Precio ($): ", cfg);
+  ```
+
+#### 8. `obtener_flotante`
+- **¿Qué hace?**: Lee un número decimal de consola sin límites específicos.
+- **¿Qué recibe?**: `const char *mensaje`
+- **¿Qué devuelve?**: `float`
+- **Ejemplo**:
+  ```c
+  float altura = obtener_flotante("Ingrese su altura en metros (ej. 1.75): ");
+  ```
+
+#### 9. `obtener_flotante_rango`
+- **¿Qué hace?**: Lee un número decimal dentro del rango `[min, max]`.
+- **¿Qué recibe?**: `const char *mensaje`, `float min`, `float max`
+- **¿Qué devuelve?**: `float`
+- **Ejemplo**:
+  ```c
+  float promedio = obtener_flotante_rango("Promedio escolar (0.0 - 10.0): ", 0.0f, 10.0f);
+  ```
+
+---
+
+### Funciones de Cadenas de Texto
+
+#### 10. `obtener_cadena_config`
+- **¿Qué hace?**: Lee una línea de texto de consola aplicando `ConfigString`. Elimina el `\n` al final y protege contra desbordamientos.
+- **¿Qué recibe?**:
+  - `const char *mensaje`: Prompt.
+  - `char *buffer`: Puntero al buffer de destino.
+  - `int tamanio`: Capacidad total del buffer.
+  - `ConfigString config`: Reglas de validación.
+- **¿Qué devuelve?**: `1` si fue exitoso, `0` en caso de falla.
+- **Ejemplo**:
+  ```c
+  char clave[32];
+  ConfigString cfg = {.min_longitud = 8, .max_longitud = 30, .permitir_vacio = 0, .reintentos = 3, .mostrar_error = 1};
+  obtener_cadena_config("Cree su contraseña: ", clave, sizeof(clave), cfg);
+  ```
+
+#### 11. `obtener_cadena`
+- **¿Qué hace?**: Lee una cadena de texto sin restricciones especiales.
+- **¿Qué recibe?**: `const char *mensaje`, `char *buffer`, `int tamanio`
+- **¿Qué devuelve?**: `void`
+- **Ejemplo**:
+  ```c
+  char nombre[50];
+  obtener_cadena("Ingrese su nombre: ", nombre, sizeof(nombre));
+  ```
+
+#### 12. `obtener_cadena_min`
+- **¿Qué hace?**: Lee una cadena de texto exigiendo una longitud mínima determinada.
+- **¿Qué recibe?**: `const char *mensaje`, `char *buffer`, `int tamanio`, `int min_longitud`
+- **¿Qué devuelve?**: `1` si fue válida, `0` si falló.
+- **Ejemplo**:
+  ```c
+  char usuario[30];
+  obtener_cadena_min("Nombre de usuario (mínimo 4 letras): ", usuario, sizeof(usuario), 4);
+  ```
+
+---
+
+### Funciones de Confirmación y Dominio
+
+#### 13. `obtener_si_no`
+- **¿Qué hace?**: Solicita una respuesta de confirmación. Acepta `'s'`, `'S'`, `'n'`, `'N'`, `'y'`, `'Y'`.
+- **¿Qué recibe?**: `const char *mensaje`
+- **¿Qué devuelve?**: `1` para Sí / Yes, `0` para No.
+- **Ejemplo**:
+  ```c
+  if (obtener_si_no("¿Desea guardar los cambios?")) {
+      printf("Guardado exitoso.\n");
+  }
+  ```
+
+#### 14. `obtener_email`
+- **¿Qué hace?**: Lee y valida sintácticamente un correo electrónico (requiere `'@'` y `'.'` posterior).
+- **¿Qué recibe?**: `const char *mensaje`, `char *buffer`, `int tamanio`
+- **¿Qué devuelve?**: `1` si el email es válido, `0` si es inválido.
+- **Ejemplo**:
+  ```c
+  char email[100];
+  obtener_email("Correo electrónico: ", email, sizeof(email));
+  ```
+
+#### 15. `obtener_telefono`
+- **¿Qué hace?**: Lee y valida un número de teléfono (exclusivamente caracteres numéricos de 7 a 15 dígitos).
+- **¿Qué recibe?**: `const char *mensaje`, `char *buffer`, `int tamanio`
+- **¿Qué devuelve?**: `1` si es válido, `0` en caso contrario.
+- **Ejemplo**:
+  ```c
+  char tel[20];
+  obtener_telefono("Teléfono de contacto: ", tel, sizeof(tel));
+  ```
+
+#### 16. `obtener_opcion_menu`
+- **¿Qué hace?**: Lee una opción de menú entre `min` y `max`.
+- **¿Qué recibe?**: `const char *mensaje`, `int min`, `int max`
+- **¿Qué devuelve?**: `int` seleccionado.
+- **Ejemplo**:
+  ```c
+  int op = obtener_opcion_menu("Seleccione opción [1-4]: ", 1, 4);
+  ```
+
+---
+
+### Validaciones Directas y Macros
+
+#### Validaciones Manuales de Cadenas y Datos
+- **`validar_no_vacio(const char *texto)`**: Devuelve `1` si no es `NULL` ni `""`, `0` si es nulo/vacío.
+- **`validar_rango(int valor, int min, int max)`**: Devuelve `1` si `min <= valor <= max`.
+- **`validar_email(const char *email)`**: Devuelve `1` si contiene estructura válida de email.
+
+#### Macros de Atajo Directo
 ```c
-// SIN get-input.h - Propenso a errores, desbordamiento y bucles infinitos
-int edad;
-do {
-    printf("Edad: ");
-    if (scanf("%d", &edad) != 1) {
-        while (getchar() != '\n'); // Limpiar buffer manualmente
-        printf("Error: entrada no válida.\n");
-        continue;
-    }
-} while (edad < 0 || edad > 120);
-
-// CON get-input.h - Una sola línea limpia, segura y validada
-int edad = obtener_entero_rango("Edad: ", 0, 120);
+#define INPUT_INT(msg)                     obtener_entero(msg)
+#define INPUT_INT_RANGE(msg, min, max)     obtener_entero_rango(msg, min, max)
+#define INPUT_FLOAT(msg)                   obtener_flotante(msg)
+#define INPUT_STR(msg, buf, size)          obtener_cadena(msg, buf, size)
+#define INPUT_YES_NO(msg)                  obtener_si_no(msg)
+#define INPUT_CHAR(msg)                    obtener_caracter(msg)
 ```
 
 ---
 
-## 2. Funcionamiento Interno e Higiene de Buffer
+## 4. Sección 2: Arreglos Flexibles y Tablas Hash O(1)
 
-### 2.1 Limpieza del Buffer (`_limpiar_buffer`)
-```c
-static inline void _limpiar_buffer(void) {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) {}
-}
-```
-* **Cómo funciona**: Consume caracteres de `stdin` uno a uno con `getchar()` hasta hallar un salto de línea (`\n`) o fin de flujo (`EOF`).
-* **Por qué es vital**: Al leer datos en C, los caracteres sobrantes o el `\n` presionado por el usuario permanecen en el buffer del teclado. Si no se limpian, las siguientes llamadas a `scanf()` o `fgets()` leerán basura inmediatamente o fallarán en silencio.
+### Estructuras de Datos
 
-### 2.2 Control de Errores (`_mostrar_error`)
-```c
-static inline void _mostrar_error(const char *mensaje, int mostrar) {
-    if (mostrar) {
-        fprintf(stderr, "  Error: %s\n", mensaje);
-    }
-}
-```
-* **Cómo funciona**: Imprime advertencias en el canal de errores estándar `stderr`.
-* **Modo Silencioso**: Si `mostrar == 0`, la biblioteca opera en modo silencioso sin imprimir texto extra en la terminal.
+#### `ArregloTipo` (Enumeración)
+- `ARREGLO_TEXTO`: Almacena `char*`.
+- `ARREGLO_ENTERO`: Almacena `int`.
+- `ARREGLO_DECIMAL`: Almacena `double`.
+- `ARREGLO_BOOLEANO`: Almacena `bool`.
+
+#### `Arreglo` (Estructura Principal)
+- `ElementoArreglo *elementos`: Vector de casillas asociativas.
+- `size_t capacidad`: Capacidad asignada actual (por defecto 16).
+- `size_t tamaño`: Cantidad de claves registradas en uso.
 
 ---
 
-## 3. Tipos de Datos y Estructuras
+### Creación y Destrucción
 
-Para lecturas con reglas avanzadas, la biblioteca expone 4 estructuras de configuración:
+#### 1. `arreglo_nuevo`
+- **¿Qué hace?**: Reserva e inicializa un nuevo Arreglo Flexible con capacidad por defecto de 16 casillas.
+- **¿Qué recibe?**: `void`
+- **¿Qué devuelve?**: Puntero `Arreglo*` inicializado o `NULL` si falla memoria.
+- **Ejemplo**:
+  ```c
+  Arreglo *mi_arreglo = arreglo_nuevo();
+  ```
 
-### 3.1 `ConfigEntero`
-```c
-typedef struct {
-    int min;           // Valor entero mínimo permitido (inclusive)
-    int max;           // Valor entero máximo permitido (inclusive)
-    int reintentos;    // Número de reintentos (-1 = infinito)
-    int mostrar_error; // Mostrar mensajes de error (1/0)
-} ConfigEntero;
-```
+#### 2. `arreglo_nuevo_cap`
+- **¿Qué hace?**: Crea un Arreglo Flexible especificando una capacidad inicial personalizada.
+- **¿Qué recibe?**: `size_t capacidad_inicial`
+- **¿Qué devuelve?**: Puntero `Arreglo*`.
+- **Ejemplo**:
+  ```c
+  Arreglo *tabla_grande = arreglo_nuevo_cap(1000);
+  ```
 
-### 3.2 `ConfigFlotante`
-```c
-typedef struct {
-    double min;        // Valor mínimo permitido
-    double max;        // Valor máximo permitido
-    int reintentos;    // Número de reintentos (-1 = infinito)
-    int mostrar_error; // Mostrar mensajes de error (1/0)
-} ConfigFlotante;
-```
+#### 3. `arreglo_vaciar`
+- **¿Qué hace?**: Libera la memoria de todas las claves y valores almacenados, pero mantiene la estructura y su capacidad intactas.
+- **¿Qué recibe?**: `Arreglo *a`
+- **¿Qué devuelve?**: `void`
+- **Ejemplo**:
+  ```c
+  arreglo_vaciar(mi_arreglo);
+  ```
 
-### 3.3 `ConfigString`
-```c
-typedef struct {
-    int min_longitud;  // Longitud mínima requerida
-    int max_longitud;  // Longitud máxima permitida
-    int permitir_vacio;// Permitir string vacío (1 = sí, 0 = no)
-    int reintentos;    // Número de reintentos (-1 = infinito)
-    int mostrar_error; // Mostrar mensajes de error (1/0)
-} ConfigString;
-```
-
-### 3.4 `ConfigCaracter`
-```c
-typedef struct {
-    char opciones[256]; // Cadena con caracteres permitidos (ej. "ABC")
-    int reintentos;     // Número de reintentos (-1 = infinito)
-    int mostrar_error;  // Mostrar mensajes de error (1/0)
-} ConfigCaracter;
-```
+#### 4. `arreglo_liberar`
+- **¿Qué hace?**: Libera de forma recursiva toda la memoria dinámica ocupada por el arreglo, sus elementos y la estructura misma.
+- **¿Qué recibe?**: `Arreglo *a`
+- **¿Qué devuelve?**: `void`
+- **Ejemplo**:
+  ```c
+  arreglo_liberar(mi_arreglo);
+  ```
 
 ---
 
-## 4. Análisis de Elementos Opcionales vs Obligatorios
+### Inserción y Modificación
 
-| Elemento | Obligatorio u Opcional | Razón y Explicación Técnica |
-|----------|-------------------------|-----------------------------|
-| **`tamanio` en Cadenas** | **OBLIGATORIO** | Al manipular cadenas en C, pasar el tamaño real del arreglo (`sizeof(buffer)`) es indispensable para evitar que `fgets()` escriba más allá de la memoria asignada (*Buffer Overflow*). |
-| **Estructuras `Config...`** | **OPCIONAL** | No estás obligado a crear estas estructuras manualmente. Funciones como `obtener_entero()`, `obtener_entero_rango()`, `obtener_cadena()`, etc., las generan automáticamente usando valores por defecto. |
-| **Límite de `reintentos`** | **OPCIONAL** | Por defecto vale `-1` (reintentos infinitos). Esto es ideal para consolas interactivas donde se desea insistir hasta obtener un valor válido. Solo se especifica un número (ej. `3`) en casos de seguridad (ej. PINs). |
-| **Flag `mostrar_error`** | **OPCIONAL** | Por defecto es `1` (activo). Puede cambiarse a `0` si deseas validar datos de forma silenciosa o construir tu propia interfaz gráfica/TUI. |
-| **Macros (`INPUT_INT`, etc.)** | **OPCIONAL** | Son azúcar sintáctica para programadores que buscan escribir código más compacto. |
+#### 5. `arreglo_guardar`
+- **¿Qué hace?**: Guarda o reemplaza una cadena de texto asociada a una clave alfanumérica. Si la tabla supera el factor de carga (75%), duplica la capacidad automáticamente.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`, `const char *valor`
+- **¿Qué devuelve?**: `void`
+- **Ejemplo**:
+  ```c
+  arreglo_guardar(mi_arreglo, "ciudad", "San José");
+  ```
 
----
+#### 6. `arreglo_guardar_int`
+- **¿Qué hace?**: Guarda un entero asociado a una clave.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`, `int valor`
+- **¿Qué devuelve?**: `void`
+- **Ejemplo**:
+  ```c
+  arreglo_guardar_int(mi_arreglo, "edad", 28);
+  ```
 
-## 5. Examen de Funciones de Carácter
+#### 7. `arreglo_guardar_float`
+- **¿Qué hace?**: Guarda un número decimal (`double`) asociado a una clave.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`, `double valor`
+- **¿Qué devuelve?**: `void`
+- **Ejemplo**:
+  ```c
+  arreglo_guardar_float(mi_arreglo, "pi", 3.14159);
+  ```
 
-### 5.1 `obtener_caracter_config(mensaje, config)`
-* **Funcionamiento interno**: Usa `scanf(" %c", &c)` para saltar espacios iniciales y capturar un carácter. Llama inmediatamente a `_limpiar_buffer()`. Si `config.opciones` contiene caracteres, busca la coincidencia con `strchr()`.
-* **Uso**:
-```c
-ConfigCaracter config = { .opciones = "SIsi", .reintentos = 3, .mostrar_error = 1 };
-char r = obtener_caracter_config("¿Aceptas? (s/n): ", config);
-```
-
-### 5.2 `obtener_caracter(mensaje)`
-* **Funcionamiento**: Lee un único carácter sin restringir sus opciones.
-
-### 5.3 `obtener_caracter_opciones(mensaje, opciones)`
-* **Funcionamiento**: Permite especificar la lista de caracteres válidos en una cadena directa sin declarar la estructura.
-* **Ejemplo**:
-```c
-char opcion = obtener_caracter_opciones("Selecciona (A/B/C): ", "ABC");
-```
-
----
-
-## 6. Examen de Funciones de Enteros
-
-### 6.1 `obtener_entero_config(mensaje, config)`
-* **Funcionamiento interno**:
-  1. Lee la línea de consola con `fgets()`.
-  2. Verifica que solo contenga dígitos numéricos (y opcionalmente signo `+` o `-` inicial).
-  3. Convierte el texto con `strtol()` y valida desbordamientos mediante `errno == ERANGE`.
-  4. Comprueba que el resultado esté en el intervalo `[config.min, config.max]`.
-
-### 6.2 `obtener_entero(mensaje)`
-* **Funcionamiento**: Lee cualquier entero dentro del rango soportado por `int`.
-
-### 6.3 `obtener_entero_rango(mensaje, min, max)`
-* **Funcionamiento**: Limita la lectura entre `min` y `max`.
-* **Ejemplo**:
-```c
-int nota = obtener_entero_rango("Calificación (0 a 10): ", 0, 10);
-```
+#### 8. `arreglo_guardar_bool`
+- **¿Qué hace?**: Guarda un valor booleano (`true` / `false`) asociado a una clave.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`, `bool valor`
+- **¿Qué devuelve?**: `void`
+- **Ejemplo**:
+  ```c
+  arreglo_guardar_bool(mi_arreglo, "activo", true);
+  ```
 
 ---
 
-## 7. Examen de Funciones de Flotantes
+### Búsqueda y Consulta
 
-### 7.1 `obtener_flotante_config(mensaje, config)`
-* **Funcionamiento interno**: Lee mediante `fgets()`, convierte con `strtod()`, valida punteros de fin de conversión (`*endptr == '\0'`) y verifica límites con `config.min` y `config.max`.
+#### 9. `arreglo_buscar`
+- **¿Qué hace?**: Busca y devuelve la cadena de texto asociada a una clave en tiempo constante $O(1)$ promedio gracias al algoritmo hash FNV-1a.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`
+- **¿Qué devuelve?**: `char*` apuntando al texto almacenado o `NULL` si la clave no existe.
+- **Ejemplo**:
+  ```c
+  char *val = arreglo_buscar(mi_arreglo, "ciudad");
+  ```
 
-### 7.2 `obtener_flotante(mensaje)`
-* **Funcionamiento**: Lee un número decimal tipo `float`.
+#### 10. `arreglo_buscar_int`
+- **¿Qué hace?**: Busca y obtiene un entero por su clave.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`, `bool *encontrado` (puntero opcional).
+- **¿Qué devuelve?**: `int` encontrado o `0` si no existe.
+- **Ejemplo**:
+  ```c
+  bool ok;
+  int edad = arreglo_buscar_int(mi_arreglo, "edad", &ok);
+  ```
 
-### 7.3 `obtener_flotante_rango(mensaje, min, max)`
-* **Funcionamiento**: Lee un número decimal dentro de un rango determinado.
-* **Ejemplo**:
-```c
-float precio = obtener_flotante_rango("Precio (0.50 a 99.99): ", 0.50f, 99.99f);
-```
+#### 11. `arreglo_buscar_float`
+- **¿Qué hace?**: Busca y obtiene un decimal por su clave.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`, `bool *encontrado` (puntero opcional).
+- **¿Qué devuelve?**: `double` encontrado o `0.0`.
+- **Ejemplo**:
+  ```c
+  double pi = arreglo_buscar_float(mi_arreglo, "pi", NULL);
+  ```
 
----
-
-## 8. Examen de Funciones de Cadenas
-
-### 8.1 `obtener_cadena_config(mensaje, buffer, tamanio, config)`
-* **Funcionamiento interno**:
-  1. Lee mediante `fgets(buffer, tamanio, stdin)`.
-  2. Si la entrada excede `tamanio - 1`, vacía el sobrante con `_limpiar_buffer()`.
-  3. Valida la longitud contra `config.min_longitud`, `config.max_longitud` y `config.permitir_vacio`.
-
-### 8.2 `obtener_cadena(mensaje, buffer, tamanio)`
-* **Funcionamiento**: Lee una cadena de texto respetando el límite del buffer.
-
-### 8.3 `obtener_cadena_min(mensaje, buffer, tamanio, min_longitud)`
-* **Funcionamiento**: Requiere una longitud mínima antes de aceptar la entrada.
-* **Ejemplo**:
-```c
-char pass[64];
-obtener_cadena_min("Contraseña (mínimo 8 caracteres): ", pass, sizeof(pass), 8);
-```
-
----
-
-## 9. Examen de Funciones de Confirmación y Dominio
-
-### 9.1 `obtener_si_no(mensaje)`
-* **Funcionamiento**: Presenta el prompt `(s/n)`, lee el carácter, lo convierte a minúscula con `tolower()` y retorna `1` para `'s'`/`'y'` o `0` para `'n'`. Reintenta automáticamente en caso de error.
-
-### 9.2 `obtener_email(mensaje, buffer, tamanio)`
-* **Funcionamiento**: Obtiene una cadena y confirma mediante `strchr()` y `strrchr()` la existencia de una `@` y un punto `.` posterior.
-
-### 9.3 `obtener_telefono(mensaje, buffer, tamanio)`
-* **Funcionamiento**: Obtiene una cadena de 7 a 15 caracteres comprobando con `isdigit()` que contenga únicamente dígitos.
-
-### 9.4 `obtener_opcion_menu(mensaje, min, max)`
-* **Funcionamiento**: Solicita una opción numérica dentro del intervalo `[min, max]` de un menú.
+#### 12. `arreglo_buscar_bool`
+- **¿Qué hace?**: Busca y obtiene un booleano por su clave.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`, `bool *encontrado` (puntero opcional).
+- **¿Qué devuelve?**: `bool` (`true`/`false`).
+- **Ejemplo**:
+  ```c
+  bool activo = arreglo_buscar_bool(mi_arreglo, "activo", NULL);
+  ```
 
 ---
 
-## 10. Funciones de Validación Manual
+### Eliminación e Inspección
 
-Sirven para validar variables o cadenas de datos en memoria sin solicitar entrada por consola:
+#### 13. `arreglo_tiene`
+- **¿Qué hace?**: Verifica si una clave existe registrada en el arreglo.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`
+- **¿Qué devuelve?**: `bool` (`true` si existe, `false` si no).
+- **Ejemplo**:
+  ```c
+  if (arreglo_tiene(mi_arreglo, "edad")) { ... }
+  ```
 
-* `validar_no_vacio(texto)`: Retorna `1` si la cadena no es nula ni vacía.
-* `validar_rango(valor, min, max)`: Retorna `1` si el entero está en el rango.
-* `validar_email(email)`: Retorna `1` si la estructura del email es válida.
+#### 14. `arreglo_borrar`
+- **¿Qué hace?**: Elimina un elemento por su clave y reorganiza las colisiones internas mediante desplazamiento lineal.
+- **¿Qué recibe?**: `Arreglo *a`, `const char *clave`
+- **¿Qué devuelve?**: `bool` (`true` si fue eliminado, `false` si no existía).
+- **Ejemplo**:
+  ```c
+  arreglo_borrar(mi_arreglo, "ciudad");
+  ```
+
+#### 15. `arreglo_cuantos`
+- **¿Qué hace?**: Retorna la cantidad total de elementos activos en el arreglo.
+- **¿Qué recibe?**: `Arreglo *a`
+- **¿Qué devuelve?**: `size_t`
+- **Ejemplo**:
+  ```c
+  size_t total = arreglo_cuantos(mi_arreglo);
+  ```
+
+#### 16. `arreglo_claves`
+- **¿Qué hace?**: Devuelve un arreglo dinámico de cadenas de texto (`char**`) con todas las claves presentes.
+- **¿Qué recibe?**: `Arreglo *a`, `size_t *total` (puntero donde escribe el total).
+- **¿Qué devuelve?**: `char**` (debe liberarse la memoria de este vector con `free()`).
+- **Ejemplo**:
+  ```c
+  size_t n;
+  char **lista_claves = arreglo_claves(mi_arreglo, &n);
+  free(lista_claves);
+  ```
+
+#### 17. `arreglo_valores`
+- **¿Qué hace?**: Devuelve un arreglo dinámico de cadenas (`char**`) representando los valores convertidos a texto.
+- **¿Qué recibe?**: `Arreglo *a`, `size_t *total`.
+- **¿Qué devuelve?**: `char**`.
 
 ---
 
-## 11. Macros Útiles
+### Operaciones Avanzadas
 
-```c
-#define INPUT_INT(msg) obtener_entero(msg)
-#define INPUT_INT_RANGE(msg, min, max) obtener_entero_rango(msg, min, max)
-#define INPUT_FLOAT(msg) obtener_flotante(msg)
-#define INPUT_STR(msg, buf, size) obtener_cadena(msg, buf, size)
-#define INPUT_YES_NO(msg) obtener_si_no(msg)
-#define INPUT_CHAR(msg) obtener_caracter(msg)
-```
+#### 18. `arreglo_copiar`
+- **¿Qué hace?**: Crea una copia profunda completa de un arreglo.
+- **¿Qué recibe?**: `Arreglo *a`
+- **¿Qué devuelve?**: Puntero a la nueva estructura `Arreglo*`.
+- **Ejemplo**:
+  ```c
+  Arreglo *copia = arreglo_copiar(mi_arreglo);
+  ```
+
+#### 19. `arreglo_mezclar`
+- **¿Qué hace?**: Combina dos arreglos en uno nuevo. Si hay claves duplicadas, prevalece el valor del segundo arreglo (`b`).
+- **¿Qué recibe?**: `Arreglo *a`, `Arreglo *b`
+- **¿Qué devuelve?**: Nuevo `Arreglo*` resultante.
+- **Ejemplo**:
+  ```c
+  Arreglo *unido = arreglo_mezclar(a, b);
+  ```
+
+#### 20. `arreglo_ordenar_claves`
+- **¿Qué hace?**: Reordena internamente la tabla hash en orden alfabético según sus claves.
+- **¿Qué recibe?**: `Arreglo *a`
+- **¿Qué devuelve?**: `void`
+- **Ejemplo**:
+  ```c
+  arreglo_ordenar_claves(mi_arreglo);
+  ```
 
 ---
 
-## 12. Ejemplos Prácticos Completos
+### Macro de Iteración
 
-### Ejemplo 1: Formulario Completo de Registro
+#### `arreglo_recorrer(a, clave_var, valor_var)`
+- **¿Qué hace?**: Macro para iterar sobre todas las parejas clave-valor de forma limpia y legible.
+- **Ejemplo**:
+  ```c
+  arreglo_recorrer(mi_arreglo, clave, valor) {
+      printf("Clave: %s -> Valor: %s\n", clave, valor);
+  }
+  ```
+
+---
+
+## 5. Ejemplo Completo de Uso Integrado
+
 ```c
 #include <stdio.h>
-#include "get-input.h"
+#include "util.h"
 
 int main(void) {
-    printf("=== FORMULARIO DE REGISTRO ===\n\n");
+    printf("=== REGISTRO DE USUARIO CON UTIL.H ===\n\n");
 
-    char nombre[50];
-    obtener_cadena_min("Nombre completo (mín 2 caracteres): ", nombre, sizeof(nombre), 2);
+    // 1. Crear estructura de almacenamiento
+    Arreglo *usuario = arreglo_nuevo();
 
-    int edad = obtener_entero_rango("Edad (0 - 120): ", 0, 120);
+    // 2. Obtener datos validados desde consola
+    char nombre[100];
+    obtener_cadena("Ingresa tu nombre: ", nombre, sizeof(nombre));
+    int edad = obtener_entero_rango("Ingresa tu edad (18-99): ", 18, 99);
+    char email[100];
+    obtener_email("Ingresa tu email: ", email, sizeof(email));
+    bool es_premium = obtener_si_no("¿Desea suscripción Premium?");
 
-    char correo[100];
-    obtener_email("Correo electrónico: ", correo, sizeof(correo));
+    // 3. Guardar en el Arreglo Flexible
+    arreglo_guardar(usuario, "nombre", nombre);
+    arreglo_guardar_int(usuario, "edad", edad);
+    arreglo_guardar(usuario, "email", email);
+    arreglo_guardar_bool(usuario, "premium", es_premium);
 
-    char telefono[20];
-    obtener_telefono("Teléfono (dígitos): ", telefono, sizeof(telefono));
+    // 4. Mostrar datos consultando el Arreglo
+    printf("\n--- FICHA DE USUARIO GUARDADA ---\n");
+    printf("Nombre:  %s\n", arreglo_buscar(usuario, "nombre"));
+    printf("Edad:    %d años\n", arreglo_buscar_int(usuario, "edad", NULL));
+    printf("Email:   %s\n", arreglo_buscar(usuario, "email"));
+    printf("Premium: %s\n", arreglo_buscar_bool(usuario, "premium", NULL) ? "Sí" : "No");
 
-    if (obtener_si_no("¿Aceptas los términos y condiciones?")) {
-        printf("\n[OK] Registro finalizado con éxito para %s.\n", nombre);
-    } else {
-        printf("\n[CANCELADO] Registro cancelado.\n");
-    }
-
+    // 5. Liberar memoria
+    arreglo_liberar(usuario);
     return 0;
 }
 ```
-
----
-
-## 13. Resumen Rápido de Referencia
-
-| Función | Parámetros Principales | Retorna | Descripción Breve |
-|---------|-----------------------|---------|-------------------|
-| `obtener_entero` | `mensaje` | `int` | Lee un entero seguro. |
-| `obtener_entero_rango` | `mensaje, min, max` | `int` | Lee un entero en un rango. |
-| `obtener_flotante` | `mensaje` | `float` | Lee un número decimal. |
-| `obtener_flotante_rango` | `mensaje, min, max` | `float` | Lee un decimal en un rango. |
-| `obtener_cadena` | `mensaje, buffer, tamanio` | `void` | Lee texto de forma segura. |
-| `obtener_cadena_min` | `mensaje, buffer, tamanio, min` | `int` | Lee texto con longitud mínima. |
-| `obtener_caracter` | `mensaje` | `char` | Lee un único carácter. |
-| `obtener_caracter_opciones` | `mensaje, opciones` | `char` | Lee carácter de lista permitida. |
-| `obtener_si_no` | `mensaje` | `int` | Retorna `1` (sí) o `0` (no). |
-| `obtener_email` | `mensaje, buffer, tamanio` | `int` | Lee y valida correo electrónico. |
-| `obtener_telefono` | `mensaje, buffer, tamanio` | `int` | Lee y valida número de teléfono. |
-| `obtener_opcion_menu` | `mensaje, min, max` | `int` | Lee opción numérica de menú. |

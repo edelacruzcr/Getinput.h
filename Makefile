@@ -4,7 +4,7 @@ BIN_DIR = bin
 EXAMPLES_DIR = examples
 PREFIX ?= /usr/local
 
-HEADERS = get-input.h arreglo.h
+HEADERS = util.h
 SOURCES = $(wildcard $(EXAMPLES_DIR)/*.c)
 TARGETS = $(patsubst $(EXAMPLES_DIR)/%.c, $(BIN_DIR)/%, $(SOURCES))
 
@@ -19,16 +19,16 @@ $(BIN_DIR)/%: $(EXAMPLES_DIR)/%.c $(HEADERS)
 	$(CC) $(CFLAGS) $< -o $@
 
 install:
-	@echo "Instalando get-input.h y arreglo.h en $(PREFIX)/include..."
+	@echo "Instalando util.h en $(PREFIX)/include..."
 	@sudo mkdir -p $(PREFIX)/include
-	@sudo cp get-input.h arreglo.h $(PREFIX)/include/
-	@echo "Instalados en $(PREFIX)/include/"
-	@echo "Ahora puedes usar: #include <get-input.h> y #include <arreglo.h>"
+	@sudo cp util.h $(PREFIX)/include/
+	@echo "Instalado en $(PREFIX)/include/"
+	@echo "Ahora puedes usar: #include <util.h>"
 
 uninstall:
-	@echo "Desinstalando get-input.h y arreglo.h de $(PREFIX)/include..."
-	@sudo rm -f $(PREFIX)/include/get-input.h $(PREFIX)/include/arreglo.h
-	@echo "Bibliotecas desinstaladas con exito"
+	@echo "Desinstalando util.h y eliminando versiones anteriores de $(PREFIX)/include..."
+	@sudo rm -f $(PREFIX)/include/util.h $(PREFIX)/include/get-input.h $(PREFIX)/include/arreglo.h
+	@echo "Biblioteca desinstalada con éxito"
 
 clean:
 	rm -rf $(BIN_DIR)

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "arreglo.h"
+#include "util.h"
 
 int main(void) {
     Arreglo *config = arreglo_nuevo();

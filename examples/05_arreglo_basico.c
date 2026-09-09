@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "arreglo.h"
+#include "util.h"
 
 int main(void) {
     printf("=== DEMO DE ARREGLO.H v2.0 ===\n\n");

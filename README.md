@@ -1,31 +1,60 @@
-# Bibliotecas Header-Only para C (get-input.h y arreglo.h)
+# Biblioteca Header-Only para C (`util.h`)
 
 [![Lenguaje](https://img.shields.io/badge/Lenguaje-C99%20%2F%20C11%20%2F%20C17%20%2F%20C23-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-green.svg)](LICENSE)
-[![Versión](https://img.shields.io/badge/Versión-2.0.0-orange.svg)](get-input.h)
-[![Tipo](https://img.shields.io/badge/Tipo-Header--Only-purple.svg)](get-input.h)
+[![Versión](https://img.shields.io/badge/Versión-2.0.0-orange.svg)](util.h)
+[![Tipo](https://img.shields.io/badge/Tipo-Header--Only-purple.svg)](util.h)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](Makefile)
 
-Colección de bibliotecas **header-only** de alto rendimiento para el lenguaje C:
+Biblioteca **header-only** de alto rendimiento en C que reúne en un solo archivo (**`util.h`**):
 
-1. **`arreglo.h`**: Arreglo flexible y diccionario hash table ultrarrápido O(1) con crecimiento automático y soporte multitipo.
-2. **`get-input.h`**: Sistema de entrada de datos seguro, robusto y validado desde consola (`stdin`).
+1. **Entrada de Datos Consola**: Validación de números, cadenas, correos, teléfonos y menú interactivo.
+2. **Arreglo Flexible / Hash Table**: Tabla hash O(1) con crecimiento automático y soporte multitipo.
 
 ---
 
-## Instalación Automática en un Solo Comando
+## Guía de Instalación
 
-Para instalar ambas bibliotecas en tu sistema en `/usr/local/include`:
+### Opción 1: Instalación Automática (Recomendada)
+Para instalar o actualizar `util.h` en tu sistema (`/usr/local/include`):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/install.sh | bash
 ```
 
-Una vez instaladas, puedes incluirlas directamente en cualquier programa de C:
+### Opción 2: Descarga Directa (1 solo archivo)
+Si prefieres no usar el instalador y tener el archivo directamente en la carpeta de tu proyecto:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/util.h -o util.h
+```
+
+---
+
+## 🗑️ Eliminar Versión Anterior (`get-input.h` y `arreglo.h`)
+
+Si tenías instalada la versión previa de dos archivos, ejecuta el siguiente comando para **borrar los archivos antiguos** del sistema:
+
+### Si los instalaste globalmente en el sistema:
+```bash
+sudo rm -f /usr/local/include/get-input.h /usr/local/include/arreglo.h
+```
+
+### Si los tenías descargados localmente en tu carpeta de proyecto:
+```bash
+rm -f get-input.h arreglo.h
+```
+
+> **Nota**: El nuevo instalador (`install.sh`) detecta y elimina automáticamente las cabeceras antiguas `get-input.h` y `arreglo.h` si estuvieran presentes en tu sistema.
+
+---
+
+## Ejemplo de Uso
+
+Una vez instalado, únicamente necesitas incluir `<util.h>` en tu código de C:
 
 ```c
-#include <get-input.h>
-#include <arreglo.h>
+#include <util.h>
 
 int main(void) {
     Arreglo *datos = arreglo_nuevo();

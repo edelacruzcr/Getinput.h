@@ -3,7 +3,7 @@
 // ============================================================
 
 #include <stdio.h>
-#include "get-input.h"
+#include "util.h"
 
 int main(void) {
     printf("=== REGISTRO DE CONTACTO ===\n\n");
