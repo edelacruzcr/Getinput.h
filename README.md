@@ -8,12 +8,12 @@
 
 Biblioteca **header-only** de alto rendimiento en C que reúne en un solo archivo (**`util.h`**):
 
-1. **Entrada de Datos Consola**: Validación de números, cadenas, correos, teléfonos y menú interactivo.
+1. **Entrada de Datos Consola**: Validación de números, cadenas, correos, teléfonos y menús interactivos.
 2. **Arreglo Flexible / Hash Table**: Tabla hash O(1) con crecimiento automático y soporte multitipo.
 
 ---
 
-## Guía de Instalación
+## ⚡ Guía de Instalación
 
 ### Opción 1: Instalación Automática (Recomendada)
 Para instalar o actualizar `util.h` en tu sistema (`/usr/local/include`):
@@ -31,64 +31,166 @@ curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/util.h 
 
 ---
 
-## 🗑️ Eliminar Versión Anterior (`get-input.h` y `arreglo.h`)
+## 🗑️ Migración desde Versiones Anteriores (`get-input.h` y `arreglo.h`)
 
-Si tenías instalada la versión previa de dos archivos, ejecuta el siguiente comando para **borrar los archivos antiguos** del sistema:
+Si tenías instalada la versión previa de dos archivos, ejecuta el siguiente comando para **borrar los archivos antiguos**:
 
-### Si los instalaste globalmente en el sistema:
-```bash
-sudo rm -f /usr/local/include/get-input.h /usr/local/include/arreglo.h
-```
+- **En el sistema (`/usr/local/include`)**:
+  ```bash
+  sudo rm -f /usr/local/include/get-input.h /usr/local/include/arreglo.h
+  ```
+- **En la carpeta de tu proyecto**:
+  ```bash
+  rm -f get-input.h arreglo.h
+  ```
 
-### Si los tenías descargados localmente en tu carpeta de proyecto:
-```bash
-rm -f get-input.h arreglo.h
-```
-
-> **Nota**: El nuevo instalador (`install.sh`) detecta y elimina automáticamente las cabeceras antiguas `get-input.h` y `arreglo.h` si estuvieran presentes en tu sistema.
+> **Nota**: El instalador (`install.sh`) detecta y elimina automáticamente las cabeceras antiguas `get-input.h` y `arreglo.h`.
 
 ---
 
-## Ejemplo de Uso
+## 🚀 Ejemplos de Uso
 
-Una vez instalado, únicamente necesitas incluir `<util.h>` en tu código de C:
+Todos los ejemplos se encuentran disponibles en la carpeta [`examples/`](examples) del repositorio y están listos para compilar con `make`.
+
+### Índice de Ejemplos y Archivos Fuente
+
+| N° | Ejemplo | Descripción | Archivo Fuente |
+|---|---|---|---|
+| **01** | **Entrada Básica** | Lectura limpia de enteros, flotantes y cadenas sin buffer residual | [`01_basico.c`](examples/01_basico.c) |
+| **02** | **Validaciones Avanzadas** | Rangos de números, longitud mínima de clave y confirmaciones | [`02_validaciones.c`](examples/02_validaciones.c) |
+| **03** | **Email y Teléfono** | Validación automática de formato de correo y número telefónico | [`03_email_telefono.c`](examples/03_email_telefono.c) |
+| **04** | **Menú Interactivo** | Creación rápida de menús de consola seguros frente a entradas inválidas | [`04_menu_interactivo.c`](examples/04_menu_interactivo.c) |
+| **05** | **Arreglo / Hash Table** | Creación, inserción multitipo, consulta, recorrido y clonación | [`05_arreglo_basico.c`](examples/05_arreglo_basico.c) |
+| **06** | **Configuración Sistema** | Almacenamiento y actualización de ajustes tipo clave-valor | [`06_arreglo_configuracion.c`](examples/06_arreglo_configuracion.c) |
+| **07** | **Contador & Ordenamiento** | Conteo de frecuencia de palabras y ordenamiento alfabético de claves | [`07_arreglo_contador_palabras.c`](examples/07_arreglo_contador_palabras.c) |
+| **08** | **Uso Unificado Integrado** | Captura de datos de consola y guardado en estructura hash O(1) | [`08_util_unificado.c`](examples/08_util_unificado.c) |
+
+---
+
+### Fragmentos de Código de los Casos Más Frecuentes
+
+#### 1. Entrada de Datos por Consola (`obtener_*`)
 
 ```c
-#include <util.h>
+#include <stdio.h>
+#include "util.h"
 
 int main(void) {
-    Arreglo *datos = arreglo_nuevo();
-    int edad = obtener_entero_rango("Ingresa tu edad (0-120): ", 0, 120);
-    arreglo_guardar_int(datos, "edad", edad);
+    // Lectura simple
+    int edad = obtener_entero("Ingresa tu edad: ");
+    char nombre[50];
+    obtener_cadena("Ingresa tu nombre completo: ", nombre, sizeof(nombre));
+    float estatura = obtener_flotante("Ingresa tu estatura (m): ");
+
+    // Validaciones avanzadas
+    int nota = obtener_entero_rango("Calificación (0-10): ", 0, 10);
+    char correo[100];
+    if (obtener_email("Correo electrónico: ", correo, sizeof(correo))) {
+        printf("Email guardado: %s\n", correo);
+    }
     
-    printf("Edad guardada: %d anos\n", arreglo_buscar_int(datos, "edad", NULL));
-    arreglo_liberar(datos);
+    int aceptar = obtener_si_no("¿Deseas guardar los cambios?");
+    return 0;
+}
+```
+
+#### 2. Arreglo Flexible / Tabla Hash O(1) (`arreglo_*`)
+
+```c
+#include <stdio.h>
+#include "util.h"
+
+int main(void) {
+    Arreglo *a = arreglo_nuevo();
+    
+    // Guardar múltiples tipos por clave
+    arreglo_guardar(a, "nombre", "Juan");
+    arreglo_guardar_int(a, "edad", 25);
+    arreglo_guardar_float(a, "altura", 1.75);
+    arreglo_guardar_bool(a, "activo", true);
+    
+    // Búsqueda
+    bool ok = false;
+    int edad = arreglo_buscar_int(a, "edad", &ok);
+    if (ok) printf("Edad: %d años\n", edad);
+    
+    // Recorrido clave-valor
+    arreglo_recorrer(a, clave, valor) {
+        printf("  %s -> %s\n", clave, valor);
+    }
+    
+    arreglo_liberar(a);
+    return 0;
+}
+```
+
+#### 3. Menú Interactivo Seguro
+
+```c
+#include <stdio.h>
+#include "util.h"
+
+int main(void) {
+    while (1) {
+        printf("\n--- MENU DE OPCIONES ---\n1. Continuar\n2. Salir\n");
+        int opcion = obtener_opcion_menu("Selecciona una opción (1-2): ", 1, 2);
+        if (opcion == 2) break;
+        printf("Ejecutando acción...\n");
+    }
+    return 0;
+}
+```
+
+#### 4. Ejemplo Integrado (Entrada + Tabla Hash)
+
+```c
+#include <stdio.h>
+#include "util.h"
+
+int main(void) {
+    Arreglo *perfil = arreglo_nuevo();
+
+    // Lectura de datos validados
+    char nombre[100];
+    obtener_cadena("Nombre completo: ", nombre, sizeof(nombre));
+    int edad = obtener_entero_rango("Edad (0-120): ", 0, 120);
+
+    // Almacenamiento en la Tabla Hash
+    arreglo_guardar(perfil, "nombre", nombre);
+    arreglo_guardar_int(perfil, "edad", edad);
+
+    // Mostrar datos almacenados
+    printf("Nombre: %s, Edad: %d\n", 
+            arreglo_buscar(perfil, "nombre"), 
+            arreglo_buscar_int(perfil, "edad", NULL));
+
+    arreglo_liberar(perfil);
     return 0;
 }
 ```
 
 ---
 
-# 1. arreglo.h - Arreglo Flexible Ultra Mejorado para C
+## 🛠️ Compilación y Ejecución de Ejemplos
 
-**Versión: 2.0.0 | Licencia: MIT | Header-Only | Máximo Rendimiento**
+Puedes compilar y ejecutar todos los ejemplos fácilmente mediante el `Makefile` incluido:
 
-## ¿Qué es?
+```bash
+# Compilar todos los ejemplos
+make clean && make
 
-Un **Arreglo Flexible** es una estructura de datos que combina arreglos dinámicos y diccionarios (tabla hash). Permite disponer de una lista de crecimiento automático y búsquedas ultrarrápidas asociadas a claves alfanuméricas.
-
-### Características Principales
-
-- **Crecimiento automático**: Redimensionamiento automático según el factor de carga (0.75).
-- **Búsqueda ultrarrápida**: Tabla hash con algoritmo FNV-1a y complejidad O(1) promedio.
-- **Múltiples tipos de datos**: Compatible con texto, enteros, decimales y booleanos.
-- **Iteración sencilla**: Macro `arreglo_recorrer()` para iterar pares clave-valor.
-- **Seguro**: Verificación de punteros nulos y gestión transparente de memoria.
-- **Operaciones avanzadas**: Copia profunda, mezcla de arreglos y ordenamiento de claves.
+# Ejecutar un ejemplo individual
+./bin/01_basico
+./bin/04_menu_interactivo
+./bin/05_arreglo_basico
+./bin/08_util_unificado
+```
 
 ---
 
-## Tabla de Funciones de `arreglo.h`
+## 📘 Referencia de la API (`util.h`)
+
+### 1. Módulo de Arreglos Flexibles y Tablas Hash O(1)
 
 | Función | ¿Qué hace? | ¿Qué recibe? | ¿Qué devuelve? | Ejemplo |
 |---------|------------|--------------|----------------|---------|
@@ -106,7 +208,7 @@ Un **Arreglo Flexible** es una estructura de datos que combina arreglos dinámic
 | `arreglo_borrar(a, k)` | Elimina elemento | Arreglo, clave | `bool` | `arreglo_borrar(a, "edad");` |
 | `arreglo_cuantos(a)` | Número de elementos | Arreglo | `size_t` | `size_t n = arreglo_cuantos(a);` |
 | `arreglo_claves(a, &n)` | Obtiene todas las claves | Arreglo, puntero | `char**` | `char **k = arreglo_claves(a, &n);` |
-| `arreglo_valores(a, &n)` | Obtiene todos los valores | Arreglo, puntero | `char**` | `char **v = arreglo_valores(a, &n);` |
+| `arreglo_valores(a, &n)` | Obtiene todos los valores | Arreglo, puntero | `char**` | `char **v = arreglo_valores(a, &v);` |
 | `arreglo_vaciar(a)` | Elimina todo el contenido | Arreglo | `void` | `arreglo_vaciar(a);` |
 | `arreglo_liberar(a)` | Libera toda la memoria | Arreglo | `void` | `arreglo_liberar(a);` |
 | `arreglo_copiar(a)` | Copia el arreglo | Arreglo | `Arreglo*` | `Arreglo *b = arreglo_copiar(a);` |
@@ -116,78 +218,7 @@ Un **Arreglo Flexible** es una estructura de datos que combina arreglos dinámic
 
 ---
 
-## Rendimiento de `arreglo.h`
-
-| Operación | Complejidad | Velocidad |
-|-----------|-------------|-----------|
-| Insertar | O(1) promedio | Ultrarrápido |
-| Buscar | O(1) promedio | Ultrarrápido |
-| Eliminar | O(1) promedio | Ultrarrápido |
-| Recorrer | O(n) | Rápido |
-| Copiar | O(n) | Rápido |
-| Mezclar | O(n+m) | Rápido |
-
----
-
-## Ejemplo Completo de `arreglo.h`
-
-```c
-#include <stdio.h>
-#include "arreglo.h"
-
-int main(void) {
-    // 1. Crear
-    Arreglo *a = arreglo_nuevo();
-    
-    // 2. Guardar
-    arreglo_guardar(a, "nombre", "Juan");
-    arreglo_guardar_int(a, "edad", 25);
-    arreglo_guardar_float(a, "altura", 1.75);
-    arreglo_guardar_bool(a, "activo", true);
-    
-    // 3. Buscar
-    printf("Nombre: %s\n", arreglo_buscar(a, "nombre"));
-    
-    bool ok;
-    int edad = arreglo_buscar_int(a, "edad", &ok);
-    if (ok) printf("Edad: %d años\n", edad);
-    
-    // 4. Recorrer
-    printf("\nElementos guardados:\n");
-    arreglo_recorrer(a, clave, valor) {
-        printf("  %s -> %s\n", clave, valor);
-    }
-    
-    // 5. Liberar
-    arreglo_liberar(a);
-    return 0;
-}
-```
-
----
-
-# 2. get-input.h - Entrada Segura y Robusta para C
-
-**Versión: 2.0.0 | Licencia: MIT | Header-Only**
-
-## ¿Qué es?
-
-`get-input.h` simplifica la lectura de datos por consola (`stdin`), evitando errores típicos de `scanf()`, desbordamientos de buffer y bucles infinitos por entradas inválidas.
-
-### Solución
-
-```c
-// Código C tradicional propenso a errores:
-int edad;
-if (scanf("%d", &edad) != 1) { while(getchar() != '\n'); }
-
-// Con get-input.h:
-int edad = obtener_entero_rango("Edad: ", 0, 120);
-```
-
----
-
-## Tabla de Funciones de `get-input.h`
+### 2. Módulo de Entrada de Datos y Validación (`stdin`)
 
 | Función | Parámetros | Retorna | Descripción |
 |---------|------------|---------|-------------|
@@ -206,33 +237,15 @@ int edad = obtener_entero_rango("Edad: ", 0, 120);
 
 ---
 
-## Métodos de Instalación y Compilación
+## 📄 Documentación Adicional
 
-### Opción 1: Script de instalación local
-```bash
-git clone https://github.com/edelacruzcr/Getinput.h.git
-cd Getinput.h
-./install.sh
-```
-
-### Opción 2: Compilar ejemplos con Makefile
-```bash
-make
-./bin/01_basico
-./bin/05_arreglo_basico
-./bin/06_arreglo_configuracion
-./bin/07_arreglo_contador_palabras
-```
-
-### Opción 3: CMake
-```bash
-mkdir build && cd build
-cmake ..
-sudo make install
-```
+Para más detalles sobre la arquitectura interna y la guía de uso paso a paso:
+- 📖 [Guía de Uso Completa](docs/guia_de_uso.md)
+- 🛠️ [Manual Técnico y Arquitectura](docs/manual.md)
 
 ---
 
 ## Licencia
 
 Este proyecto se distribuye bajo la [Licencia MIT](LICENSE). Libre para uso personal, académico y comercial.
+
