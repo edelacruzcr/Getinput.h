@@ -1,4 +1,4 @@
-# get-input.h - Biblioteca de Entrada Segura y Robusta para C
+# Bibliotecas Header-Only para C (get-input.h y arreglo.h)
 
 [![Lenguaje](https://img.shields.io/badge/Lenguaje-C99%20%2F%20C11%20%2F%20C17%20%2F%20C23-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-green.svg)](LICENSE)
@@ -6,380 +6,204 @@
 [![Tipo](https://img.shields.io/badge/Tipo-Header--Only-purple.svg)](get-input.h)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](Makefile)
 
-**`get-input.h`** es una biblioteca **header-only** para lenguaje C que simplifica la entrada de datos del usuario por consola (`stdin`), haciendo que sea **segura, robusta y fácil de usar**.
+Colección de bibliotecas **header-only** de alto rendimiento para el lenguaje C:
+
+1. **`arreglo.h`**: Arreglo flexible y diccionario hash table ultrarrápido O(1) con crecimiento automático y soporte multitipo.
+2. **`get-input.h`**: Sistema de entrada de datos seguro, robusto y validado desde consola (`stdin`).
 
 ---
 
-## Instalación Automática en un Solo Comando (Recomendado)
+## Instalación Automática en un Solo Comando
 
-Para instalar `get-input.h` en tu sistema con un único comando:
-
-### Linux / macOS / Windows (Git Bash):
+Para instalar ambas bibliotecas en tu sistema en `/usr/local/include`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/install.sh | bash
 ```
 
-¡Y listo! Ya puedes incluirla directamente en cualquier programa de C:
+Una vez instaladas, puedes incluirlas directamente en cualquier programa de C:
 
 ```c
-#include <get-input.h>   // Instalado y listo para usar
+#include <get-input.h>
+#include <arreglo.h>
 
 int main(void) {
-    int edad = obtener_entero("Ingresa tu edad: ");
-    printf("Edad: %d años\n", edad);
+    Arreglo *datos = arreglo_nuevo();
+    int edad = obtener_entero_rango("Ingresa tu edad (0-120): ", 0, 120);
+    arreglo_guardar_int(datos, "edad", edad);
+    
+    printf("Edad guardada: %d anos\n", arreglo_buscar_int(datos, "edad", NULL));
+    arreglo_liberar(datos);
     return 0;
 }
 ```
 
 ---
 
-## ¿Qué problema resuelve?
+# 1. arreglo.h - Arreglo Flexible Ultra Mejorado para C
 
-### El problema en C tradicional:
+**Versión: 2.0.0 | Licencia: MIT | Header-Only | Máximo Rendimiento**
+
+## ¿Qué es?
+
+Un **Arreglo Flexible** es una estructura de datos que combina arreglos dinámicos y diccionarios (tabla hash). Permite disponer de una lista de crecimiento automático y búsquedas ultrarrápidas asociadas a claves alfanuméricas.
+
+### Características Principales
+
+- **Crecimiento automático**: Redimensionamiento automático según el factor de carga (0.75).
+- **Búsqueda ultrarrápida**: Tabla hash con algoritmo FNV-1a y complejidad O(1) promedio.
+- **Múltiples tipos de datos**: Compatible con texto, enteros, decimales y booleanos.
+- **Iteración sencilla**: Macro `arreglo_recorrer()` para iterar pares clave-valor.
+- **Seguro**: Verificación de punteros nulos y gestión transparente de memoria.
+- **Operaciones avanzadas**: Copia profunda, mezcla de arreglos y ordenamiento de claves.
+
+---
+
+## Tabla de Funciones de `arreglo.h`
+
+| Función | ¿Qué hace? | ¿Qué recibe? | ¿Qué devuelve? | Ejemplo |
+|---------|------------|--------------|----------------|---------|
+| `arreglo_nuevo()` | Crea un arreglo vacío | Nada | `Arreglo*` | `Arreglo *a = arreglo_nuevo();` |
+| `arreglo_nuevo_cap(n)` | Crea con capacidad inicial | Capacidad | `Arreglo*` | `Arreglo *a = arreglo_nuevo_cap(100);` |
+| `arreglo_guardar(a, k, v)` | Guarda texto con clave | Arreglo, clave, valor | `void` | `arreglo_guardar(a, "nombre", "Juan");` |
+| `arreglo_guardar_int(a, k, n)` | Guarda número entero | Arreglo, clave, entero | `void` | `arreglo_guardar_int(a, "edad", 25);` |
+| `arreglo_guardar_float(a, k, n)` | Guarda decimal | Arreglo, clave, decimal | `void` | `arreglo_guardar_float(a, "pi", 3.14);` |
+| `arreglo_guardar_bool(a, k, b)` | Guarda booleano | Arreglo, clave, bool | `void` | `arreglo_guardar_bool(a, "ok", true);` |
+| `arreglo_buscar(a, k)` | Busca texto por clave | Arreglo, clave | `char*` o `NULL` | `char *v = arreglo_buscar(a, "nombre");` |
+| `arreglo_buscar_int(a, k, &ok)` | Busca entero por clave | Arreglo, clave, puntero | `int` | `int edad = arreglo_buscar_int(a, "edad", &ok);` |
+| `arreglo_buscar_float(a, k, &ok)` | Busca decimal por clave | Arreglo, clave, puntero | `double` | `double h = arreglo_buscar_float(a, "h", &ok);` |
+| `arreglo_buscar_bool(a, k, &ok)` | Busca booleano | Arreglo, clave, puntero | `bool` | `bool act = arreglo_buscar_bool(a, "a", &ok);` |
+| `arreglo_tiene(a, k)` | Verifica existencia | Arreglo, clave | `bool` | `if (arreglo_tiene(a, "edad"))` |
+| `arreglo_borrar(a, k)` | Elimina elemento | Arreglo, clave | `bool` | `arreglo_borrar(a, "edad");` |
+| `arreglo_cuantos(a)` | Número de elementos | Arreglo | `size_t` | `size_t n = arreglo_cuantos(a);` |
+| `arreglo_claves(a, &n)` | Obtiene todas las claves | Arreglo, puntero | `char**` | `char **k = arreglo_claves(a, &n);` |
+| `arreglo_valores(a, &n)` | Obtiene todos los valores | Arreglo, puntero | `char**` | `char **v = arreglo_valores(a, &n);` |
+| `arreglo_vaciar(a)` | Elimina todo el contenido | Arreglo | `void` | `arreglo_vaciar(a);` |
+| `arreglo_liberar(a)` | Libera toda la memoria | Arreglo | `void` | `arreglo_liberar(a);` |
+| `arreglo_copiar(a)` | Copia el arreglo | Arreglo | `Arreglo*` | `Arreglo *b = arreglo_copiar(a);` |
+| `arreglo_mezclar(a, b)` | Une dos arreglos | Arreglo, Arreglo | `Arreglo*` | `Arreglo *c = arreglo_mezclar(a, b);` |
+| `arreglo_recorrer(a, k, v)` | Macro de iteración | Arreglo, vars | Loop | `arreglo_recorrer(a, k, v) { ... }` |
+| `arreglo_ordenar_claves(a)` | Ordena por clave | Arreglo | `void` | `arreglo_ordenar_claves(a);` |
+
+---
+
+## Rendimiento de `arreglo.h`
+
+| Operación | Complejidad | Velocidad |
+|-----------|-------------|-----------|
+| Insertar | O(1) promedio | Ultrarrápido |
+| Buscar | O(1) promedio | Ultrarrápido |
+| Eliminar | O(1) promedio | Ultrarrápido |
+| Recorrer | O(n) | Rápido |
+| Copiar | O(n) | Rápido |
+| Mezclar | O(n+m) | Rápido |
+
+---
+
+## Ejemplo Completo de `arreglo.h`
 
 ```c
-// Código complicado y peligroso (propenso a desbordamiento y bucles infinitos)
-int edad;
-printf("Edad: ");
-if (scanf("%d", &edad) != 1) {
-    while(getchar() != '\n'); // Limpiar buffer
-    printf("Error\n");
+#include <stdio.h>
+#include "arreglo.h"
+
+int main(void) {
+    // 1. Crear
+    Arreglo *a = arreglo_nuevo();
+    
+    // 2. Guardar
+    arreglo_guardar(a, "nombre", "Juan");
+    arreglo_guardar_int(a, "edad", 25);
+    arreglo_guardar_float(a, "altura", 1.75);
+    arreglo_guardar_bool(a, "activo", true);
+    
+    // 3. Buscar
+    printf("Nombre: %s\n", arreglo_buscar(a, "nombre"));
+    
+    bool ok;
+    int edad = arreglo_buscar_int(a, "edad", &ok);
+    if (ok) printf("Edad: %d años\n", edad);
+    
+    // 4. Recorrer
+    printf("\nElementos guardados:\n");
+    arreglo_recorrer(a, clave, valor) {
+        printf("  %s -> %s\n", clave, valor);
+    }
+    
+    // 5. Liberar
+    arreglo_liberar(a);
+    return 0;
 }
 ```
 
-### La solución con `get-input.h`:
+---
+
+# 2. get-input.h - Entrada Segura y Robusta para C
+
+**Versión: 2.0.0 | Licencia: MIT | Header-Only**
+
+## ¿Qué es?
+
+`get-input.h` simplifica la lectura de datos por consola (`stdin`), evitando errores típicos de `scanf()`, desbordamientos de buffer y bucles infinitos por entradas inválidas.
+
+### Solución
 
 ```c
-// Simple, seguro y validado en una sola línea
+// Código C tradicional propenso a errores:
+int edad;
+if (scanf("%d", &edad) != 1) { while(getchar() != '\n'); }
+
+// Con get-input.h:
 int edad = obtener_entero_rango("Edad: ", 0, 120);
 ```
 
 ---
 
-## Características Principales
+## Tabla de Funciones de `get-input.h`
 
-| Característica | Descripción |
-|----------------|-------------|
-| **Header-Only** | Solo un archivo `.h`, no necesita compilación separada |
-| **Seguro** | Protege contra desbordamientos de buffer (*Buffer Overflow*) |
-| **Robusto** | Maneja entradas inválidas automáticamente |
-| **Configurable** | Límites, reintentos, mensajes de error |
-| **Multiplataforma** | Funciona en Linux, macOS, Windows |
-| **Sin dependencias** | Solo usa la biblioteca estándar de C |
+| Función | Parámetros | Retorna | Descripción |
+|---------|------------|---------|-------------|
+| `obtener_caracter` | `mensaje` | `char` | Lee un carácter |
+| `obtener_caracter_opciones` | `mensaje, opciones` | `char` | Lee carácter de opciones permitidas |
+| `obtener_entero` | `mensaje` | `int` | Lee un entero |
+| `obtener_entero_rango` | `mensaje, min, max` | `int` | Lee entero en rango |
+| `obtener_flotante` | `mensaje` | `float` | Lee un flotante |
+| `obtener_flotante_rango` | `mensaje, min, max` | `float` | Lee flotante en rango |
+| `obtener_cadena` | `mensaje, buffer, tamaño` | `void` | Lee cadena de texto segura |
+| `obtener_cadena_min` | `mensaje, buffer, tamaño, min` | `int` | Lee cadena con longitud mínima |
+| `obtener_si_no` | `mensaje` | `int` | Confirmación Sí/No (1/0) |
+| `obtener_email` | `mensaje, buffer, tamaño` | `int` | Lee y valida correo electrónico |
+| `obtener_telefono` | `mensaje, buffer, tamaño` | `int` | Lee y valida teléfono numérico |
+| `obtener_opcion_menu` | `mensaje, min, max` | `int` | Lee opción válida de menú |
 
 ---
 
-## Otros Métodos de Instalación
+## Métodos de Instalación y Compilación
 
-### Método 1: Con Script Local (`install.sh`)
+### Opción 1: Script de instalación local
 ```bash
 git clone https://github.com/edelacruzcr/Getinput.h.git
 cd Getinput.h
 ./install.sh
 ```
 
-### Método 2: Con Makefile (Profesional)
+### Opción 2: Compilar ejemplos con Makefile
 ```bash
-make install    # Instala en /usr/local/include/get-input.h
-make uninstall  # Desinstala la biblioteca
+make
+./bin/01_basico
+./bin/05_arreglo_basico
+./bin/06_arreglo_configuracion
+./bin/07_arreglo_contador_palabras
 ```
 
-### Método 3: Con CMake (Moderno)
+### Opción 3: CMake
 ```bash
 mkdir build && cd build
 cmake ..
 sudo make install
 ```
 
-### Método 4: Instalación Local en tu Proyecto
-```bash
-mkdir -p include
-cp get-input.h include/
-```
-```c
-#include "include/get-input.h" // Inclusión local
-```
-
----
-
-## Compilación
-
-Puedes compilar cualquier programa C que use `get-input.h` usando tu compilador habitual:
-
-```bash
-gcc -Wall -Wextra -std=c99 main.c -o programa
-./programa
-```
-
-### Compilar los Ejemplos del Repositorio
-El repositorio incluye un `Makefile` para compilar los ejemplos en `examples/`:
-
-```bash
-make
-./bin/01_basico
-./bin/02_validaciones
-./bin/03_email_telefono
-./bin/04_menu_interactivo
-```
-
----
-
-## Estructuras de Configuración
-
-```c
-// Para enteros
-typedef struct {
-    int min;           // Valor mínimo
-    int max;           // Valor máximo
-    int reintentos;    // Intentos permitidos (-1 = infinito)
-    int mostrar_error; // Mostrar errores (1 = sí, 0 = silencioso)
-} ConfigEntero;
-
-// Para flotantes
-typedef struct {
-    double min;        // Valor mínimo
-    double max;        // Valor máximo
-    int reintentos;    // Intentos permitidos
-    int mostrar_error; // Mostrar errores
-} ConfigFlotante;
-
-// Para strings
-typedef struct {
-    int min_longitud;  // Longitud mínima
-    int max_longitud;  // Longitud máxima
-    int permitir_vacio;// Permitir vacío (1/0)
-    int reintentos;    // Intentos permitidos
-    int mostrar_error; // Mostrar errores
-} ConfigString;
-
-// Para caracteres
-typedef struct {
-    char opciones[256]; // Caracteres permitidos (ej. "ABC")
-    int reintentos;     // Intentos permitidos
-    int mostrar_error;  // Mostrar errores
-} ConfigCaracter;
-```
-
----
-
-## Elementos Opcionales vs. Obligatorios
-
-- **Buffer y Tamaño (`tamanio`)**: **Obligatorio** en lectura de cadenas (ej. `obtener_cadena(msg, buf, sizeof(buf))`). Esto le indica a `fgets()` la capacidad máxima de memoria para evitar desbordamientos.
-- **Estructuras `Config...`**: **Opcional**. Si usas funciones simples como `obtener_entero()` o `obtener_cadena()`, la biblioteca aplicará valores por defecto automáticamente.
-- **Reintentos (`reintentos`)**: **Opcional**. Por defecto vale `-1` (reintentos infinitos). Se modifica solo en casos de seguridad (ej. 3 intentos para un PIN).
-- **Mensajes de error (`mostrar_error`)**: **Opcional**. Por defecto es `1`. Puedes cambiarlo a `0` para operaciones silenciosas.
-
----
-
-## Guía de Funciones
-
-### 1. Funciones de Caracteres
-```c
-// Leer un carácter cualquiera
-char c = obtener_caracter("Escribe algo: ");
-
-// Leer solo de opciones
-char c = obtener_caracter_opciones("Elige (A/B/C): ", "ABC");
-
-// Leer con configuración
-ConfigCaracter config = { .opciones = "SI", .reintentos = 3, .mostrar_error = 1 };
-char c = obtener_caracter_config("¿Continuar? (S/N): ", config);
-```
-
-### 2. Funciones de Enteros
-```c
-// Leer cualquier entero
-int num = obtener_entero("Número: ");
-
-// Leer con rango
-int edad = obtener_entero_rango("Edad (0-120): ", 0, 120);
-
-// Leer con configuración personalizada
-ConfigEntero config = { .min = 18, .max = 65, .reintentos = 3, .mostrar_error = 1 };
-int edad = obtener_entero_config("Edad (18-65): ", config);
-```
-
-### 3. Funciones de Flotantes
-```c
-// Leer cualquier flotante
-float precio = obtener_flotante("Precio: ");
-
-// Leer con rango
-float temp = obtener_flotante_rango("Temp (-10 a 40): ", -10, 40);
-
-// Leer con configuración
-ConfigFlotante config = { .min = 0.0, .max = 10.0, .reintentos = 5, .mostrar_error = 0 };
-float nota = obtener_flotante_config("Nota: ", config);
-```
-
-### 4. Funciones de Cadenas
-```c
-// Leer cualquier texto (incluye espacios y evita desbordamiento)
-char nombre[50];
-obtener_cadena("Nombre: ", nombre, sizeof(nombre));
-
-// Leer con longitud mínima
-char pass[50];
-obtener_cadena_min("Contraseña (mín 8): ", pass, sizeof(pass), 8);
-
-// Leer con configuración
-ConfigString config = { .min_longitud = 3, .max_longitud = 20, .permitir_vacio = 0, .reintentos = 3, .mostrar_error = 1 };
-char usuario[50];
-obtener_cadena_config("Usuario: ", usuario, sizeof(usuario), config);
-```
-
-### 5. Funciones Especiales (Email, Teléfono, Menú, Confirmación)
-```c
-// Confirmación Sí/No
-if (obtener_si_no("¿Deseas continuar?")) {
-    printf("Continuando...\n");
-}
-
-// Email (valida @ y .)
-char email[100];
-obtener_email("Email: ", email, sizeof(email));
-
-// Teléfono (solo dígitos)
-char telefono[20];
-obtener_telefono("Teléfono: ", telefono, sizeof(telefono));
-
-// Opción de menú
-int opcion = obtener_opcion_menu("Selecciona (1-4): ", 1, 4);
-```
-
-### 6. Funciones de Validación Manual
-```c
-if (validar_no_vacio(nombre)) { printf("Nombre válido\n"); }
-if (validar_rango(edad, 0, 120)) { printf("Edad válida\n"); }
-if (validar_email(email)) { printf("Email válido\n"); }
-```
-
----
-
-## Macros Útiles
-
-```c
-#define INPUT_INT(msg) obtener_entero(msg)
-#define INPUT_INT_RANGE(msg, min, max) obtener_entero_rango(msg, min, max)
-#define INPUT_FLOAT(msg) obtener_flotante(msg)
-#define INPUT_STR(msg, buf, size) obtener_cadena(msg, buf, size)
-#define INPUT_YES_NO(msg) obtener_si_no(msg)
-#define INPUT_CHAR(msg) obtener_caracter(msg)
-```
-
----
-
-## Ejemplo Completo de Formulario
-
-```c
-#include <stdio.h>
-#include <get-input.h> // Si se instaló de forma global
-
-int main(void) {
-    printf("=== REGISTRO DE USUARIO ===\n\n");
-    
-    // 1. Nombre completo (mínimo 2 caracteres)
-    char nombre[50];
-    obtener_cadena_min("Nombre completo: ", nombre, sizeof(nombre), 2);
-    
-    // 2. Edad (0-120)
-    int edad = obtener_entero_rango("Edad (0-120): ", 0, 120);
-    
-    // 3. Email (validado)
-    char email[100];
-    obtener_email("Correo electrónico: ", email, sizeof(email));
-    
-    // 4. Teléfono (solo dígitos)
-    char telefono[20];
-    obtener_telefono("Teléfono: ", telefono, sizeof(telefono));
-    
-    // 5. Contraseña (mínimo 8)
-    char pass[50];
-    obtener_cadena_min("Contraseña (mín 8): ", pass, sizeof(pass), 8);
-    
-    // 6. Confirmación
-    if (obtener_si_no("¿Confirmas el registro?")) {
-        printf("\n[OK] Usuario %s registrado correctamente.\n", nombre);
-        printf("Email: %s\n", email);
-        printf("Teléfono: %s\n", telefono);
-    } else {
-        printf("\n[CANCELADO] Registro cancelado.\n");
-    }
-    
-    return 0;
-}
-```
-
----
-
-## Tabla de Funciones
-
-| Función | Parámetros | Retorna | Descripción |
-|---------|------------|---------|-------------|
-| `obtener_caracter` | `mensaje` | `char` | Lee un carácter |
-| `obtener_caracter_opciones` | `mensaje, opciones` | `char` | Lee carácter con opciones |
-| `obtener_entero` | `mensaje` | `int` | Lee entero |
-| `obtener_entero_rango` | `mensaje, min, max` | `int` | Lee entero en rango |
-| `obtener_flotante` | `mensaje` | `float` | Lee flotante |
-| `obtener_flotante_rango` | `mensaje, min, max` | `float` | Lee flotante en rango |
-| `obtener_cadena` | `mensaje, buffer, tamaño` | `void` | Lee cadena |
-| `obtener_cadena_min` | `mensaje, buffer, tamaño, min` | `int` | Lee cadena con mínimo |
-| `obtener_si_no` | `mensaje` | `int` | Lee sí/no |
-| `obtener_email` | `mensaje, buffer, tamaño` | `int` | Lee y valida email |
-| `obtener_telefono` | `mensaje, buffer, tamaño` | `int` | Lee y valida teléfono |
-| `obtener_opcion_menu` | `mensaje, min, max` | `int` | Lee opción de menú |
-| `validar_no_vacio` | `texto` | `int` | Valida no vacío |
-| `validar_rango` | `valor, min, max` | `int` | Valida rango |
-| `validar_email` | `email` | `int` | Valida email |
-
----
-
-## ¿Cuándo Usar Cada Función?
-
-| Situación | Función Sugerida |
-|-----------|------------------|
-| **Una letra** | `obtener_caracter()` |
-| **Una letra con opciones** | `obtener_caracter_opciones()` |
-| **Un número cualquiera** | `obtener_entero()` |
-| **Un número en rango** | `obtener_entero_rango()` |
-| **Un número decimal** | `obtener_flotante()` |
-| **Un número decimal en rango** | `obtener_flotante_rango()` |
-| **Un texto con espacios** | `obtener_cadena()` |
-| **Un texto con longitud mínima** | `obtener_cadena_min()` |
-| **Confirmación sí/no** | `obtener_si_no()` |
-| **Email validado** | `obtener_email()` |
-| **Teléfono validado** | `obtener_telefono()` |
-| **Opción de menú** | `obtener_opcion_menu()` |
-
----
-
-## Ventajas
-
-1. **Seguro**: Protege contra desbordamientos de buffer.
-2. **Robusto**: Maneja entradas inválidas y limpia `stdin`.
-3. **Simple**: Una sola línea para cada operación.
-4. **Configurable**: Límites, reintentos y errores.
-5. **Portable**: Funciona en Linux, macOS y Windows.
-6. **Header-only**: Un solo archivo de cabecera.
-7. **Documentado**: Funciones explicadas y con ejemplos claros.
-
----
-
-## ¡Listo para Usar!
-
-```c
-#include <get-input.h>   // Instalado automáticamente
-
-int main(void) {
-    int edad = obtener_entero_rango("Edad (0-120): ", 0, 120);
-    printf("Edad: %d años\n", edad);
-    return 0;
-}
-```
-
 ---
 
 ## Licencia
 
-Este proyecto está distribuido bajo la [Licencia MIT](LICENSE). Libre para uso comercial, académico y personal.
+Este proyecto se distribuye bajo la [Licencia MIT](LICENSE). Libre para uso personal, académico y comercial.

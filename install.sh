@@ -1,17 +1,18 @@
 #!/bin/bash
 # ============================================================
-# install.sh - Instalador automático universal para get-input.h
+# install.sh - Instalador automatico universal
+# Bibliotecas: get-input.h y arreglo.h
 # ============================================================
 
 set -e
 
-echo "Instalando get-input.h..."
+echo "Instalando bibliotecas C (get-input.h, arreglo.h)..."
 
 # Detectar sistema operativo
 OS=$(uname -s 2>/dev/null || echo "Unknown")
 echo "Sistema operativo detectado: $OS"
 
-# Definir directorio de instalación
+# Definir directorio de instalacion
 case "$OS" in
     Linux|Darwin)
         INSTALL_DIR="/usr/local/include"
@@ -32,41 +33,48 @@ case "$OS" in
         ;;
 esac
 
-# Verificar si el archivo get-input.h existe localmente o descargarlo de GitHub
-if [ ! -f "get-input.h" ]; then
-    echo "Descargando get-input.h desde el repositorio oficial de GitHub..."
-    if command -v curl >/dev/null 2>&1; then
-        curl -fsSL https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/get-input.h -o get-input.h
-    elif command -v wget >/dev/null 2>&1; then
-        wget -q https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/get-input.h -O get-input.h
-    else
-        echo "Error: Se requiere 'curl' o 'wget' para descargar get-input.h"
-        exit 1
-    fi
-fi
+ARCHIVOS=("get-input.h" "arreglo.h")
 
-# Copiar el archivo al directorio de destino
-echo "Copiando get-input.h a $INSTALL_DIR..."
-if [ "$INSTALL_DIR" = "/usr/local/include" ] || [ "$INSTALL_DIR" = "/usr/include" ]; then
-    if [ "$(id -u)" -ne 0 ]; then
-        sudo mkdir -p "$INSTALL_DIR"
-        sudo cp get-input.h "$INSTALL_DIR/"
+for ARCHIVO in "${ARCHIVOS[@]}"; do
+    # Verificar si el archivo existe localmente o descargarlo de GitHub
+    if [ ! -f "$ARCHIVO" ]; then
+        echo "Descargando $ARCHIVO desde el repositorio oficial de GitHub..."
+        if command -v curl >/dev/null 2>&1; then
+            curl -fsSL "https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/$ARCHIVO" -o "$ARCHIVO"
+        elif command -v wget >/dev/null 2>&1; then
+            wget -q "https://raw.githubusercontent.com/edelacruzcr/Getinput.h/main/$ARCHIVO" -O "$ARCHIVO"
+        else
+            echo "Error: Se requiere 'curl' o 'wget' para descargar $ARCHIVO"
+            exit 1
+        fi
+    fi
+
+    # Copiar el archivo al directorio de destino
+    echo "Copiando $ARCHIVO a $INSTALL_DIR..."
+    if [ "$INSTALL_DIR" = "/usr/local/include" ] || [ "$INSTALL_DIR" = "/usr/include" ]; then
+        if [ "$(id -u)" -ne 0 ]; then
+            sudo mkdir -p "$INSTALL_DIR"
+            sudo cp "$ARCHIVO" "$INSTALL_DIR/"
+        else
+            mkdir -p "$INSTALL_DIR"
+            cp "$ARCHIVO" "$INSTALL_DIR/"
+        fi
     else
         mkdir -p "$INSTALL_DIR"
-        cp get-input.h "$INSTALL_DIR/"
+        cp "$ARCHIVO" "$INSTALL_DIR/"
     fi
-else
-    mkdir -p "$INSTALL_DIR"
-    cp get-input.h "$INSTALL_DIR/"
-fi
 
-# Verificación de la instalación
-if [ -f "$INSTALL_DIR/get-input.h" ]; then
-    echo ""
-    echo "get-input.h se ha instalado correctamente en: $INSTALL_DIR/get-input.h"
-    echo "Ahora puedes incluirlo en tus programas en C usando:"
-    echo "   #include <get-input.h>"
-else
-    echo "Error al instalar get-input.h en $INSTALL_DIR"
-    exit 1
-fi
+    # Verificacion de la instalacion
+    if [ -f "$INSTALL_DIR/$ARCHIVO" ]; then
+        echo "  - $ARCHIVO instalado correctamente en: $INSTALL_DIR/$ARCHIVO"
+    else
+        echo "Error al instalar $ARCHIVO en $INSTALL_DIR"
+        exit 1
+    fi
+done
+
+echo ""
+echo "Instalacion completada con exito."
+echo "Ahora puedes incluir las bibliotecas en tus programas de C:"
+echo "   #include <get-input.h>"
+echo "   #include <arreglo.h>"

@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
-project(get-input VERSION 2.0.0 LANGUAGES C)
+project(getinput_arreglo VERSION 2.0.0 LANGUAGES C)
 
-# Instalación de la biblioteca Header-Only
-install(FILES get-input.h DESTINATION /usr/local/include)
+# Instalacion de las bibliotecas Header-Only
+install(FILES get-input.h arreglo.h DESTINATION /usr/local/include)
 
 # Mensaje informativo
-message(STATUS "get-input.h preparado para instalación en /usr/local/include")
-message(STATUS "Usa: #include <get-input.h>")
+message(STATUS "get-input.h y arreglo.h preparados para instalacion en /usr/local/include")
+message(STATUS "Usa: #include <get-input.h> y #include <arreglo.h>")
